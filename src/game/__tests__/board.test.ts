@@ -52,6 +52,7 @@ describe('board utilities', () => {
 
   it('supports deterministic random target generation through an injected rng', () => {
     expect(randomTarget(2, () => 0)).toBe(1);
+    expect(randomTarget(2, () => 1)).toBe(40);
     expect(randomTarget(2, () => 0.999999)).toBe(40);
   });
 });

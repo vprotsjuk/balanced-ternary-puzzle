@@ -34,7 +34,9 @@ export function parseManualTarget(raw: string, size: BoardSize): number | null {
 }
 
 export function randomTarget(size: BoardSize, rng: () => number = Math.random): number {
-  return Math.floor(rng() * BOARD_MAX_BY_SIZE[size]) + 1;
+  const max = BOARD_MAX_BY_SIZE[size];
+  const sample = Math.min(Math.max(rng(), 0), 1);
+  return Math.min(Math.floor(sample * max), max - 1) + 1;
 }
 
 export { cycleBoardSize, getBoardRangeLabel };
