@@ -9,6 +9,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "types": ["vitest/config"],
     "strict": true,
     "noUncheckedSideEffectImports": true,
     "outDir": "./node_modules/.tmp/tsconfig.node"
