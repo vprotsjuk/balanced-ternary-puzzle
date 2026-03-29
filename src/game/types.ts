@@ -1,7 +1,5 @@
 export type BoardSize = 2 | 3 | 4;
 export type CellState = 'neutral' | 'plus' | 'minus';
-export type PlayMode = 'random' | 'sequential';
-export type GameStatus = 'playing' | 'celebrating';
 
 export interface Cell {
   value: number;
