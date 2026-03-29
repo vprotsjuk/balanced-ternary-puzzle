@@ -23,6 +23,24 @@ describe('board utilities', () => {
       2187,
       6561,
     ]);
+    expect(buildCellValues(4)).toEqual([
+      1,
+      3,
+      9,
+      27,
+      81,
+      243,
+      729,
+      2187,
+      6561,
+      19683,
+      59049,
+      177147,
+      531441,
+      1594323,
+      4782969,
+      14348907,
+    ]);
   });
 
   it('creates neutral cells for the active board size', () => {
@@ -32,6 +50,8 @@ describe('board utilities', () => {
       { value: 9, state: 'neutral' },
       { value: 27, state: 'neutral' },
     ]);
+    expect(createNeutralCells(4)).toHaveLength(16);
+    expect(createNeutralCells(4)[15]).toEqual({ value: 14348907, state: 'neutral' });
   });
 
   it('returns exact target ranges for each board', () => {
@@ -56,12 +76,24 @@ describe('board utilities', () => {
 
   it('rejects invalid runtime board sizes instead of normalizing them', () => {
     expect(() => cycleBoardSize(99 as never)).toThrow('Invalid board size: 99');
+    expect(() => buildCellValues(99 as never)).toThrow('Invalid board size: 99');
+    expect(() => createNeutralCells(99 as never)).toThrow('Invalid board size: 99');
+    expect(() => getBoardRangeLabel(99 as never)).toThrow('Invalid board size: 99');
+    expect(() => parseManualTarget('1', 99 as never)).toThrow('Invalid board size: 99');
+    expect(() => randomTarget(99 as never, () => 0)).toThrow('Invalid board size: 99');
   });
 
   it('cycles cell states neutral -> plus -> minus -> neutral', () => {
     expect(cycleCellState('neutral')).toBe('plus');
     expect(cycleCellState('plus')).toBe('minus');
     expect(cycleCellState('minus')).toBe('neutral');
+  });
+
+  it('rejects invalid runtime cell states instead of normalizing them', () => {
+    expect(() => cycleCellState('broken' as never)).toThrow('Invalid cell state: broken');
+    expect(() =>
+      computeCurrentSum([{ value: 1, state: 'broken' as never }]),
+    ).toThrow('Invalid cell state: broken');
   });
 
   it('computes the signed sum from cell states', () => {
