@@ -1,0 +1,32 @@
+:root {
+  font-family: Inter, system-ui, sans-serif;
+  color: #151515;
+  background: #f7f3ec;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.app-title {
+  margin: 0 0 0.5rem;
+}
+
+.app-subtitle {
+  margin: 0;
+}
