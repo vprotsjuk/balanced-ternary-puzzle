@@ -9,7 +9,11 @@ export const BOARD_MAX_BY_SIZE: Record<BoardSize, number> = {
 };
 
 export function requireBoardSize(size: BoardSize): BoardSize {
-  if (!Object.prototype.hasOwnProperty.call(BOARD_MAX_BY_SIZE, size)) {
+  if (
+    typeof size !== 'number' ||
+    !Number.isInteger(size) ||
+    !BOARD_SIZES.includes(size as BoardSize)
+  ) {
     throw new Error(`Invalid board size: ${size}`);
   }
   return size;

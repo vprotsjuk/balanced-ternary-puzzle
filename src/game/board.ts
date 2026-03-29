@@ -23,10 +23,18 @@ export function cycleCellState(state: CellState): CellState {
   throw new Error(`Invalid cell state: ${state}`);
 }
 
+function requireCellValue(value: Cell['value']): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    throw new Error(`Invalid cell value: ${value}`);
+  }
+  return value;
+}
+
 export function computeCurrentSum(cells: Cell[]): number {
   return cells.reduce((sum, cell) => {
-    if (cell.state === 'plus') return sum + cell.value;
-    if (cell.state === 'minus') return sum - cell.value;
+    const value = requireCellValue(cell.value);
+    if (cell.state === 'plus') return sum + value;
+    if (cell.state === 'minus') return sum - value;
     if (cell.state === 'neutral') return sum;
     throw new Error(`Invalid cell state: ${cell.state}`);
   }, 0);

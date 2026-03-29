@@ -83,6 +83,12 @@ describe('board utilities', () => {
     expect(() => randomTarget(99 as never, () => 0)).toThrow('Invalid board size: 99');
   });
 
+  it('rejects stringified runtime board sizes instead of coercing them', () => {
+    expect(() => cycleBoardSize('2' as never)).toThrow('Invalid board size: 2');
+    expect(() => buildCellValues('3' as never)).toThrow('Invalid board size: 3');
+    expect(() => getBoardRangeLabel('4' as never)).toThrow('Invalid board size: 4');
+  });
+
   it('cycles cell states neutral -> plus -> minus -> neutral', () => {
     expect(cycleCellState('neutral')).toBe('plus');
     expect(cycleCellState('plus')).toBe('minus');
@@ -94,6 +100,15 @@ describe('board utilities', () => {
     expect(() =>
       computeCurrentSum([{ value: 1, state: 'broken' as never }]),
     ).toThrow('Invalid cell state: broken');
+  });
+
+  it('rejects malformed runtime cell values instead of producing nonsense', () => {
+    expect(() =>
+      computeCurrentSum([{ value: '1' as never, state: 'plus' }]),
+    ).toThrow('Invalid cell value: 1');
+    expect(() =>
+      computeCurrentSum([{ value: NaN, state: 'minus' }]),
+    ).toThrow('Invalid cell value: NaN');
   });
 
   it('computes the signed sum from cell states', () => {
