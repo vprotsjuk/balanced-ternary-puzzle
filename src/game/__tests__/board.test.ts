@@ -1,4 +1,5 @@
 import {
+  createNeutralCells,
   buildCellValues,
   computeCurrentSum,
   cycleBoardSize,
@@ -11,7 +12,26 @@ import {
 describe('board utilities', () => {
   it('builds ascending powers of 3 for the active board size', () => {
     expect(buildCellValues(2)).toEqual([1, 3, 9, 27]);
-    expect(buildCellValues(3).slice(0, 4)).toEqual([1, 3, 9, 27]);
+    expect(buildCellValues(3)).toEqual([
+      1,
+      3,
+      9,
+      27,
+      81,
+      243,
+      729,
+      2187,
+      6561,
+    ]);
+  });
+
+  it('creates neutral cells for the active board size', () => {
+    expect(createNeutralCells(2)).toEqual([
+      { value: 1, state: 'neutral' },
+      { value: 3, state: 'neutral' },
+      { value: 9, state: 'neutral' },
+      { value: 27, state: 'neutral' },
+    ]);
   });
 
   it('returns exact target ranges for each board', () => {
@@ -32,6 +52,10 @@ describe('board utilities', () => {
     expect(cycleBoardSize(2)).toBe(3);
     expect(cycleBoardSize(3)).toBe(4);
     expect(cycleBoardSize(4)).toBe(2);
+  });
+
+  it('rejects invalid runtime board sizes instead of normalizing them', () => {
+    expect(() => cycleBoardSize(99 as never)).toThrow('Invalid board size: 99');
   });
 
   it('cycles cell states neutral -> plus -> minus -> neutral', () => {

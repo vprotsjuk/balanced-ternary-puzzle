@@ -10,6 +10,9 @@ export const BOARD_MAX_BY_SIZE: Record<BoardSize, number> = {
 
 export function cycleBoardSize(size: BoardSize): BoardSize {
   const index = BOARD_SIZES.indexOf(size);
+  if (index === -1) {
+    throw new Error(`Invalid board size: ${size}`);
+  }
   return BOARD_SIZES[(index + 1) % BOARD_SIZES.length];
 }
 
