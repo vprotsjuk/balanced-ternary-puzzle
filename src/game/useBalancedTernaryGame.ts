@@ -12,13 +12,15 @@ export function useBalancedTernaryGame(initialState?: GameState) {
 
   return {
     state,
-    selectBoardSize: (boardSize: BoardSize, nextTarget?: number) =>
+    selectBoardSize: (boardSize: BoardSize, nextTarget: number) =>
       dispatch({ type: 'board/selected', boardSize, nextTarget }),
-    setRandomMode: (enabled: boolean, nextTargets?: Record<BoardSize, number>) =>
-      dispatch({ type: 'mode/toggled', enabled, nextTargets }),
+    enableRandomMode: (nextTargetsByBoard: Record<BoardSize, number>) =>
+      dispatch({ type: 'mode/toggled', enabled: true, nextTargets: nextTargetsByBoard }),
+    disableRandomMode: () => dispatch({ type: 'mode/toggled', enabled: false }),
     changeDraftTarget: (value: string) => dispatch({ type: 'draft/changed', value }),
     submitTarget: (raw: string) => dispatch({ type: 'target/submitted', raw }),
     tapCell: (index: number) => dispatch({ type: 'cell/tapped', index }),
-    finishCelebration: (nextTarget?: number) => dispatch({ type: 'round/finished', nextTarget }),
+    finishCelebrationRandom: (nextTarget: number) => dispatch({ type: 'round/finished', nextTarget }),
+    finishCelebrationSequential: () => dispatch({ type: 'round/finished' }),
   };
 }
