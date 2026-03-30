@@ -12,6 +12,7 @@ api.disableRandomMode();
 api.finishCelebrationRandom(21);
 api.finishCelebrationSequential();
 
+// @ts-expect-error Missing explicit random target.
 api.selectBoardSize(boardSize);
 // @ts-expect-error Missing explicit random target map.
 api.enableRandomMode();

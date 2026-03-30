@@ -12,7 +12,7 @@ export function useBalancedTernaryGame(initialState?: GameState) {
 
   return {
     state,
-    selectBoardSize: (boardSize: BoardSize, nextTarget?: number) =>
+    selectBoardSize: (boardSize: BoardSize, nextTarget: number) =>
       dispatch({ type: 'board/selected', boardSize, nextTarget }),
     enableRandomMode: (nextTargetsByBoard: Record<BoardSize, number>) =>
       dispatch({ type: 'mode/toggled', enabled: true, nextTargets: nextTargetsByBoard }),

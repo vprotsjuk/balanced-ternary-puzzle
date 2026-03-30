@@ -16,7 +16,7 @@ export function GameView({ initialState }: { initialState?: GameState }) {
       return;
     }
 
-    game.selectBoardSize(boardSize);
+    game.selectBoardSize(boardSize, 1);
   };
   const completeCelebration = () => {
     if (game.state.playMode === 'random') {
