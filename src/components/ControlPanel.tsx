@@ -27,18 +27,30 @@ export function ControlPanel({
 }) {
   return (
     <section className="control-panel" aria-label="Game controls" aria-disabled={blocked}>
-      <div className="board-size-row" role="group" aria-label="Board size">
-        {BOARD_SIZES.map((size) => (
-          <button
-            key={size}
-            type="button"
-            className={boardSize === size ? 'chip chip--active' : 'chip'}
-            onClick={() => onSelectBoardSize(size)}
-            disabled={blocked}
-          >
-            {size}x{size}
-          </button>
-        ))}
+      <div className="control-panel__top-row">
+        <div className="board-size-row" role="group" aria-label="Board size">
+          {BOARD_SIZES.map((size) => (
+            <button
+              key={size}
+              type="button"
+              className={boardSize === size ? 'chip chip--active' : 'chip'}
+              onClick={() => onSelectBoardSize(size)}
+              disabled={blocked}
+            >
+              {size}x{size}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className="random-toggle"
+          aria-pressed={playMode === 'random'}
+          onClick={() => (playMode === 'random' ? onDisableRandomMode() : onEnableRandomMode())}
+          disabled={blocked}
+        >
+          Random {playMode === 'random' ? 'ON' : 'OFF'}
+        </button>
       </div>
 
       <div className="target-entry">
@@ -59,16 +71,6 @@ export function ControlPanel({
           </button>
         </div>
       </div>
-
-      <button
-        type="button"
-        className="random-toggle"
-        aria-pressed={playMode === 'random'}
-        onClick={() => (playMode === 'random' ? onDisableRandomMode() : onEnableRandomMode())}
-        disabled={blocked}
-      >
-        Random {playMode === 'random' ? 'ON' : 'OFF'}
-      </button>
     </section>
   );
 }

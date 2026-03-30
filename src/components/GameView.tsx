@@ -23,35 +23,39 @@ export function GameView({ initialState }: { initialState?: GameState }) {
   return (
     <main className="app-shell">
       <h1 className="app-title">Balanced Ternary Puzzle</h1>
-      <StatusStrip
-        boardSize={game.state.boardSize}
-        target={game.state.target}
-        currentSum={currentSum}
-      />
-      <ControlPanel
-        boardSize={game.state.boardSize}
-        playMode={game.state.playMode}
-        draftTarget={game.state.draftTarget}
-        placeholder={getBoardRangeLabel(game.state.boardSize)}
-        blocked={blocked}
-        onSelectBoardSize={handleSelectBoardSize}
-        onEnableRandomMode={() =>
-          game.enableRandomMode({
-            2: randomTarget(2),
-            3: randomTarget(3),
-            4: randomTarget(4),
-          })
-        }
-        onDisableRandomMode={game.disableRandomMode}
-        onDraftChange={game.changeDraftTarget}
-        onSubmitTarget={game.submitTarget}
-      />
-      <BoardGrid
-        boardSize={game.state.boardSize}
-        cells={game.state.cells}
-        blocked={blocked}
-        onCellTap={game.tapCell}
-      />
+      <div className="game-layout">
+        <StatusStrip
+          boardSize={game.state.boardSize}
+          target={game.state.target}
+          currentSum={currentSum}
+        />
+        <ControlPanel
+          boardSize={game.state.boardSize}
+          playMode={game.state.playMode}
+          draftTarget={game.state.draftTarget}
+          placeholder={getBoardRangeLabel(game.state.boardSize)}
+          blocked={blocked}
+          onSelectBoardSize={handleSelectBoardSize}
+          onEnableRandomMode={() =>
+            game.enableRandomMode({
+              2: randomTarget(2),
+              3: randomTarget(3),
+              4: randomTarget(4),
+            })
+          }
+          onDisableRandomMode={game.disableRandomMode}
+          onDraftChange={game.changeDraftTarget}
+          onSubmitTarget={game.submitTarget}
+        />
+        <div className="board-stage">
+          <BoardGrid
+            boardSize={game.state.boardSize}
+            cells={game.state.cells}
+            blocked={blocked}
+            onCellTap={game.tapCell}
+          />
+        </div>
+      </div>
     </main>
   );
 }

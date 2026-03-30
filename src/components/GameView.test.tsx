@@ -144,3 +144,21 @@ it('exposes the cell state in the board accessibility surface', () => {
   expect(screen.getByRole('button', { name: 'Cell 3, plus' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Cell 9, minus' })).toBeInTheDocument();
 });
+
+it('renders the mobile layout hooks for a wide centered board and horizontal status row', () => {
+  const { container } = render(
+    <GameView
+      initialState={createGameState({
+        boardSize: 4,
+        playMode: 'sequential',
+        target: 40,
+      })}
+    />,
+  );
+
+  expect(container.querySelector('.game-layout')).toBeInTheDocument();
+  expect(container.querySelector('.status-strip--compact')).toBeInTheDocument();
+  expect(container.querySelector('.control-panel__top-row')).toBeInTheDocument();
+  expect(container.querySelector('.board-stage')).toBeInTheDocument();
+  expect(container.querySelector('.board-grid--size-4')).toBeInTheDocument();
+});

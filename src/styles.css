@@ -36,8 +36,8 @@ input {
   min-height: 100dvh;
   display: grid;
   gap: 0.875rem;
-  padding: 1rem;
-  max-width: 34rem;
+  width: min(100%, 42rem);
+  padding: clamp(0.75rem, 3vw, 1.25rem);
   margin: 0 auto;
 }
 
@@ -48,10 +48,19 @@ input {
   letter-spacing: -0.04em;
 }
 
+.game-layout {
+  display: grid;
+  gap: 0.875rem;
+}
+
 .status-strip,
 .control-panel {
   display: grid;
   gap: 0.75rem;
+}
+
+.status-strip--compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .status-card,
@@ -67,6 +76,7 @@ input {
   display: grid;
   gap: 0.35rem;
   padding: 0.95rem 1rem;
+  min-width: 0;
 }
 
 .status-label,
@@ -80,9 +90,9 @@ input {
 
 .status-value {
   display: block;
-  font-size: 2rem;
+  min-width: 0;
+  font-size: clamp(1.5rem, 6vw, 2rem);
   line-height: 1;
-  white-space: nowrap;
 }
 
 .status-meta {
@@ -96,6 +106,15 @@ input {
   gap: 0.5rem;
 }
 
+.control-panel {
+  padding: 0.9rem;
+}
+
+.control-panel__top-row {
+  display: grid;
+  gap: 0.65rem;
+}
+
 .chip,
 .random-toggle,
 .target-entry-row button {
@@ -107,12 +126,17 @@ input {
 .chip {
   background: #f0e6d8;
   color: #41362b;
+  min-width: 0;
 }
 
 .chip--active,
 .random-toggle {
   background: #1f1a16;
   color: #fff;
+}
+
+.random-toggle {
+  width: 100%;
 }
 
 .target-entry {
@@ -122,8 +146,9 @@ input {
 
 .target-entry-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(5.5rem, auto);
   gap: 0.5rem;
+  align-items: stretch;
 }
 
 .target-entry-row input {
@@ -143,11 +168,12 @@ input {
 .board-grid {
   display: grid;
   grid-template-columns: repeat(var(--board-size), minmax(0, 1fr));
-  gap: 0.35rem;
-  width: min(100%, 30rem);
-  margin: 0 auto;
+  gap: clamp(0.25rem, 1vw, 0.45rem);
+  width: 100%;
+  max-width: 34rem;
+  margin: 0;
   aspect-ratio: 1 / 1;
-  padding: 1rem;
+  padding: clamp(0.55rem, 2vw, 0.95rem);
 }
 
 .board-cell {
@@ -159,10 +185,29 @@ input {
   width: 100%;
   min-width: 0;
   min-height: 0;
+  padding: clamp(0.2rem, 1.2vw, 0.45rem);
   color: #41362b;
-  font-size: clamp(1rem, 4vw, 1.5rem);
+  font-size: var(--cell-font-size, clamp(1rem, 4vw, 1.5rem));
   font-weight: 700;
   text-align: center;
+}
+
+.board-stage {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.board-grid--size-2 {
+  --cell-font-size: clamp(1.2rem, 6vw, 2rem);
+}
+
+.board-grid--size-3 {
+  --cell-font-size: clamp(1rem, 4.6vw, 1.6rem);
+}
+
+.board-grid--size-4 {
+  --cell-font-size: clamp(0.82rem, 3.8vw, 1.18rem);
 }
 
 .board-cell--plus {
@@ -189,6 +234,7 @@ input {
   justify-items: center;
   align-content: center;
   line-height: 0.92;
+  width: 100%;
 }
 
 .adaptive-number__line {
@@ -197,4 +243,11 @@ input {
 
 .adaptive-number__line-break {
   display: none;
+}
+
+@media (min-width: 32rem) {
+  .control-panel__top-row {
+    grid-template-columns: minmax(0, 1fr) minmax(9rem, auto);
+    align-items: stretch;
+  }
 }

@@ -14,7 +14,7 @@ export function BoardGrid({
 }) {
   return (
     <section
-      className="board-grid"
+      className={`board-grid board-grid--size-${boardSize}`}
       aria-label={`Board ${boardSize} by ${boardSize}`}
       aria-disabled={blocked}
       style={{ ['--board-size' as string]: String(boardSize) }}
