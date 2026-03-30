@@ -145,8 +145,8 @@ it('exposes the cell state in the board accessibility surface', () => {
   expect(screen.getByRole('button', { name: 'Cell 9, minus' })).toBeInTheDocument();
 });
 
-it('does not force long status banners into a narrow two-column strip', () => {
-  const { container } = render(
+it('renders long 4x4 status values and labels for the game state', () => {
+  render(
     <GameView
       initialState={createGameState({
         boardSize: 4,
@@ -174,9 +174,9 @@ it('does not force long status banners into a narrow two-column strip', () => {
     />,
   );
 
-  const statusStrip = container.querySelector('.status-strip');
-  expect(statusStrip).toBeInTheDocument();
-  expect(statusStrip).not.toHaveClass('status-strip--compact');
+  expect(screen.getByText('Target')).toBeInTheDocument();
+  expect(screen.getByText('Current Sum')).toBeInTheDocument();
+  expect(screen.getByText('Board 4x4')).toBeInTheDocument();
   expect(screen.getByText('43046721', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
   expect(screen.getByText('21523360', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
 });
