@@ -24,7 +24,7 @@ beforeEach(() => {
   HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     font: '',
     measureText: (text: string) => ({ width: text.length * 10 }),
-  })) as typeof HTMLCanvasElement.prototype.getContext;
+  })) as unknown as typeof HTMLCanvasElement.prototype.getContext;
 });
 
 afterEach(() => {
