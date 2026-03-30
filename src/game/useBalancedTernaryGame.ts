@@ -38,6 +38,11 @@ export function useBalancedTernaryGame(initialState?: GameState, rng: () => numb
     changeDraftTarget: (value: string) => dispatch({ type: 'draft/changed', value }),
     submitTarget: (raw: string) => dispatch({ type: 'target/submitted', raw }),
     tapCell: (index: number) => dispatch({ type: 'cell/tapped', index }),
-    finishCelebration: () => dispatch({ type: 'round/finished', nextTargets: createRandomTargetMap(rng) }),
+    finishCelebration: () =>
+      dispatch(
+        state.playMode === 'random'
+          ? { type: 'round/finished', nextTarget: randomTarget(state.boardSize, rng) }
+          : { type: 'round/finished' },
+      ),
   };
 }

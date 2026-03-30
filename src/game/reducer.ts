@@ -3,6 +3,20 @@ import { BOARD_MAX_BY_SIZE, cycleBoardSize } from './config';
 import { resetRound, type GameState } from './state';
 import type { BoardSize } from './types';
 
+function requireValidTargetForBoard(boardSize: BoardSize, target: unknown): number {
+  const max = BOARD_MAX_BY_SIZE[boardSize];
+  if (
+    typeof target !== 'number' ||
+    !Number.isFinite(target) ||
+    !Number.isInteger(target) ||
+    target < 1 ||
+    target > max
+  ) {
+    throw new Error(`Invalid target for board ${boardSize}: ${target}`);
+  }
+  return target;
+}
+
 export type GameAction =
   | { type: 'board/selected'; boardSize: BoardSize; nextTarget?: number }
   | {
@@ -13,7 +27,7 @@ export type GameAction =
   | { type: 'draft/changed'; value: string }
   | { type: 'target/submitted'; raw: string }
   | { type: 'cell/tapped'; index: number }
-  | { type: 'round/finished'; nextTargets?: Record<BoardSize, number> };
+  | { type: 'round/finished'; nextTarget?: number };
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   if (action.type === 'round/finished' && state.status !== 'celebrating') {
@@ -31,7 +45,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           throw new Error('Missing nextTarget for random board selection');
         }
 
-        return resetRound(action.boardSize, 'random', action.nextTarget);
+        return resetRound(action.boardSize, 'random', requireValidTargetForBoard(action.boardSize, action.nextTarget));
       }
 
       return resetRound(action.boardSize, 'sequential', 1);
@@ -45,7 +59,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         throw new Error('Missing nextTargets for random mode toggle');
       }
 
-      return resetRound(state.boardSize, 'random', action.nextTargets[state.boardSize]);
+      return resetRound(
+        state.boardSize,
+        'random',
+        requireValidTargetForBoard(state.boardSize, action.nextTargets[state.boardSize]),
+      );
     }
     case 'draft/changed':
       return { ...state, draftTarget: action.value };
@@ -69,11 +87,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
     case 'round/finished': {
       if (state.playMode === 'random') {
-        if (!action.nextTargets) {
-          throw new Error('Missing nextTargets for random round completion');
+        if (typeof action.nextTarget !== 'number') {
+          throw new Error('Missing nextTarget for random round completion');
         }
 
-        return resetRound(state.boardSize, 'random', action.nextTargets[state.boardSize]);
+        return resetRound(
+          state.boardSize,
+          'random',
+          requireValidTargetForBoard(state.boardSize, action.nextTarget),
+        );
       }
 
       const maxForBoard = BOARD_MAX_BY_SIZE[state.boardSize];

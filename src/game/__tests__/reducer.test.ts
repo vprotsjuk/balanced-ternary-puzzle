@@ -61,10 +61,7 @@ describe('game reducer', () => {
 
   it('starts a fresh random round after celebration in random mode', () => {
     const state = createGameState({ boardSize: 2, playMode: 'random', target: 7, status: 'celebrating' });
-    const next = gameReducer(state, {
-      type: 'round/finished',
-      nextTargets: { 2: 21, 3: 4921, 4: 10761681 },
-    });
+    const next = gameReducer(state, { type: 'round/finished', nextTarget: 21 });
 
     expect(next.status).toBe('playing');
     expect(next.playMode).toBe('random');
@@ -106,5 +103,22 @@ describe('game reducer', () => {
     expect(blockedBoardChange).toBe(celebratingState);
     expect(blockedModeToggle).toBe(celebratingState);
     expect(blockedTap).toBe(celebratingState);
+  });
+
+  it('rejects invalid random payloads before writing them into state', () => {
+    const randomState = createGameState({ boardSize: 2, playMode: 'random', target: 7, status: 'celebrating' });
+    const sequentialState = createGameState({ boardSize: 2, playMode: 'sequential', target: 1 });
+
+    expect(() =>
+      gameReducer(randomState, { type: 'round/finished', nextTarget: 0 }),
+    ).toThrow('Invalid target for board 2: 0');
+
+    expect(() =>
+      gameReducer(sequentialState, {
+        type: 'mode/toggled',
+        enabled: true,
+        nextTargets: { 2: 0, 3: 4921, 4: 10761681 },
+      }),
+    ).toThrow('Invalid target for board 2: 0');
   });
 });
