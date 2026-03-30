@@ -9,6 +9,14 @@ export function GameView({ initialState }: { initialState?: GameState }) {
   const game = useBalancedTernaryGame(initialState);
   const currentSum = computeCurrentSum(game.state.cells);
   const blocked = game.state.status === 'celebrating';
+  const completeCelebration = () => {
+    if (game.state.playMode === 'random') {
+      game.finishCelebrationRandom(randomTarget(game.state.boardSize));
+      return;
+    }
+
+    game.finishCelebrationSequential();
+  };
 
   return (
     <main className="app-shell">
@@ -36,6 +44,11 @@ export function GameView({ initialState }: { initialState?: GameState }) {
         onDraftChange={game.changeDraftTarget}
         onSubmitTarget={game.submitTarget}
       />
+      {blocked ? (
+        <button type="button" className="random-toggle" onClick={completeCelebration}>
+          Continue
+        </button>
+      ) : null}
       <BoardGrid
         boardSize={game.state.boardSize}
         cells={game.state.cells}

@@ -1,5 +1,18 @@
-import { render, screen } from '@testing-library/react';
+import { afterEach, expect, it, vi } from 'vitest';
+import { cleanup, render, screen } from '@testing-library/react';
+
+vi.mock('./game/board', async () => {
+  const actual = await vi.importActual<typeof import('./game/board')>('./game/board');
+  return {
+    ...actual,
+    randomTarget: vi.fn(),
+  };
+});
+
+import { randomTarget } from './game/board';
 import App from './App';
+
+afterEach(() => cleanup());
 
 it('renders the mobile shell with board size buttons, displays, and input controls', () => {
   render(<App />);
@@ -9,7 +22,19 @@ it('renders the mobile shell with board size buttons, displays, and input contro
   expect(screen.getByRole('button', { name: '4x4' })).toBeInTheDocument();
   expect(screen.getByText(/target/i)).toBeInTheDocument();
   expect(screen.getByText(/current sum/i)).toBeInTheDocument();
-  expect(screen.getByLabelText(/value/i)).toBeInTheDocument();
+  expect(screen.getByLabelText('Value')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Enter' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /random/i })).toBeInTheDocument();
+});
+
+it('creates a fresh random initial state for each mount', () => {
+  vi.mocked(randomTarget).mockReturnValueOnce(11).mockReturnValueOnce(22);
+
+  const firstRender = render(<App />);
+  expect(screen.getByText('11', { selector: '.status-value' })).toBeInTheDocument();
+
+  firstRender.unmount();
+
+  render(<App />);
+  expect(screen.getByText('22', { selector: '.status-value' })).toBeInTheDocument();
 });
