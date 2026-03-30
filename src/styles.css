@@ -139,21 +139,31 @@ input {
 }
 
 .board-grid {
-  min-height: 10rem;
   display: grid;
-  gap: 0.75rem;
+  grid-template-columns: repeat(var(--board-size), minmax(0, 1fr));
+  gap: 0.35rem;
+  width: min(100%, 30rem);
+  margin: 0 auto;
+  aspect-ratio: 1 / 1;
   padding: 1rem;
 }
 
-.board-grid__placeholder {
-  color: #766858;
-}
-
-.board-grid__cells {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.board-grid__cell {
+.board-cell {
+  border: 0;
+  border-radius: 1rem;
+  background: #fffaf2;
   width: 100%;
+  min-width: 0;
+  min-height: 0;
+  color: #41362b;
+  font-size: clamp(1rem, 4vw, 1.5rem);
+  font-weight: 700;
+}
+
+.board-cell--plus {
+  background: #e5f3ea;
+}
+
+.board-cell--minus {
+  background: #f8e4e2;
 }
