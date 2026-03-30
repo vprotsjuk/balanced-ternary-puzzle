@@ -67,8 +67,11 @@ export function randomTarget(size: BoardSize, rng: () => number = Math.random): 
   if (typeof sample !== 'number' || !Number.isFinite(sample)) {
     throw new Error(`Invalid random target sample: ${sample}`);
   }
-  const clamped = Math.min(Math.max(sample, 0), 1);
-  return Math.min(Math.floor(clamped * max), max - 1) + 1;
+  if (sample < 0 || sample > 1) {
+    throw new Error(`Invalid random target sample: ${sample}`);
+  }
+  if (sample === 1) return max;
+  return Math.floor(sample * max) + 1;
 }
 
 export { cycleBoardSize, getBoardRangeLabel };

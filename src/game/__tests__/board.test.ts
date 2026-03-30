@@ -141,5 +141,7 @@ describe('board utilities', () => {
     expect(() => randomTarget(3, () => Infinity)).toThrow(
       'Invalid random target sample: Infinity',
     );
+    expect(() => randomTarget(2, () => -0.2)).toThrow('Invalid random target sample: -0.2');
+    expect(() => randomTarget(4, () => 1.2)).toThrow('Invalid random target sample: 1.2');
   });
 });
