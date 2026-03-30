@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { computeCurrentSum } from '../board';
 import { gameReducer } from '../reducer';
 import { createGameState } from '../state';
@@ -37,6 +38,12 @@ describe('game reducer', () => {
     expect(next.draftTarget).toBe('9');
   });
 
+  it('defaults sequential games to the first target instead of a random one', () => {
+    const state = createGameState({ boardSize: 3, playMode: 'sequential' });
+
+    expect(state.target).toBe(1);
+  });
+
   it('cycles a tapped cell through neutral, plus, and minus', () => {
     const state = createGameState({ boardSize: 2, playMode: 'sequential', target: 40 });
     const plusState = gameReducer(state, { type: 'cell/tapped', index: 0 });
@@ -44,5 +51,40 @@ describe('game reducer', () => {
 
     expect(plusState.cells[0].state).toBe('plus');
     expect(minusState.cells[0].state).toBe('minus');
+  });
+
+  it('ignores round completion while the game is still playing', () => {
+    const state = createGameState({ boardSize: 2, playMode: 'sequential', target: 7 });
+    const next = gameReducer(state, { type: 'round/finished' });
+
+    expect(next).toBe(state);
+  });
+
+  it('starts a fresh random round after celebration in random mode', () => {
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const state = createGameState({ boardSize: 2, playMode: 'random', target: 7, status: 'celebrating' });
+
+    const next = (() => {
+      try {
+        return gameReducer(state, { type: 'round/finished' });
+      } finally {
+        randomSpy.mockRestore();
+      }
+    })();
+
+    expect(next.status).toBe('playing');
+    expect(next.playMode).toBe('random');
+    expect(next.boardSize).toBe(2);
+    expect(next.target).toBe(21);
+  });
+
+  it('advances to the next sequential target after celebration', () => {
+    const state = createGameState({ boardSize: 2, playMode: 'sequential', target: 7, status: 'celebrating' });
+    const next = gameReducer(state, { type: 'round/finished' });
+
+    expect(next.status).toBe('playing');
+    expect(next.playMode).toBe('sequential');
+    expect(next.boardSize).toBe(2);
+    expect(next.target).toBe(8);
   });
 });

@@ -12,6 +12,10 @@ export type GameAction =
   | { type: 'round/finished' };
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
+  if (action.type === 'round/finished' && state.status !== 'celebrating') {
+    return state;
+  }
+
   if (state.status === 'celebrating' && action.type !== 'round/finished') {
     return state;
   }

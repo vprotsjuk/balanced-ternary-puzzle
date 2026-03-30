@@ -16,7 +16,7 @@ export interface GameState {
 export function createGameState(overrides: Partial<GameState> = {}): GameState {
   const boardSize = overrides.boardSize ?? 2;
   const playMode = overrides.playMode ?? 'random';
-  const target = overrides.target ?? randomTarget(boardSize);
+  const target = overrides.target ?? (playMode === 'sequential' ? 1 : randomTarget(boardSize));
 
   return {
     draftTarget: '',

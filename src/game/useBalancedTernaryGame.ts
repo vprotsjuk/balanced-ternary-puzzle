@@ -4,7 +4,11 @@ import { createGameState, type GameState } from './state';
 import type { BoardSize } from './types';
 
 export function useBalancedTernaryGame(initialState?: GameState) {
-  const [state, dispatch] = useReducer(gameReducer, initialState ?? createGameState());
+  const [state, dispatch] = useReducer(
+    gameReducer,
+    initialState,
+    (state) => state ?? createGameState(),
+  );
 
   return {
     state,
