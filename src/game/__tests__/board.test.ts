@@ -109,6 +109,15 @@ describe('board utilities', () => {
     expect(() =>
       computeCurrentSum([{ value: NaN, state: 'minus' }]),
     ).toThrow('Invalid cell value: NaN');
+    expect(() =>
+      computeCurrentSum([{ value: -3, state: 'plus' }]),
+    ).toThrow('Invalid cell value: -3');
+    expect(() =>
+      computeCurrentSum([{ value: 1.5, state: 'minus' }]),
+    ).toThrow('Invalid cell value: 1.5');
+    expect(() =>
+      computeCurrentSum([{ value: 2, state: 'neutral' }]),
+    ).toThrow('Invalid cell value: 2');
   });
 
   it('computes the signed sum from cell states', () => {
@@ -125,5 +134,12 @@ describe('board utilities', () => {
     expect(randomTarget(2, () => 0)).toBe(1);
     expect(randomTarget(2, () => 1)).toBe(40);
     expect(randomTarget(2, () => 0.999999)).toBe(40);
+  });
+
+  it('rejects invalid random target samples instead of propagating NaN', () => {
+    expect(() => randomTarget(2, () => NaN)).toThrow('Invalid random target sample: NaN');
+    expect(() => randomTarget(3, () => Infinity)).toThrow(
+      'Invalid random target sample: Infinity',
+    );
   });
 });

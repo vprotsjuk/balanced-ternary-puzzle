@@ -24,7 +24,19 @@ export function cycleCellState(state: CellState): CellState {
 }
 
 function requireCellValue(value: Cell['value']): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) {
+  if (
+    typeof value !== 'number' ||
+    !Number.isFinite(value) ||
+    !Number.isInteger(value) ||
+    value < 1
+  ) {
+    throw new Error(`Invalid cell value: ${value}`);
+  }
+  let power = value;
+  while (power % 3 === 0) {
+    power /= 3;
+  }
+  if (power !== 1) {
     throw new Error(`Invalid cell value: ${value}`);
   }
   return value;
@@ -51,8 +63,12 @@ export function parseManualTarget(raw: string, size: BoardSize): number | null {
 
 export function randomTarget(size: BoardSize, rng: () => number = Math.random): number {
   const max = BOARD_MAX_BY_SIZE[requireBoardSize(size)];
-  const sample = Math.min(Math.max(rng(), 0), 1);
-  return Math.min(Math.floor(sample * max), max - 1) + 1;
+  const sample = rng();
+  if (typeof sample !== 'number' || !Number.isFinite(sample)) {
+    throw new Error(`Invalid random target sample: ${sample}`);
+  }
+  const clamped = Math.min(Math.max(sample, 0), 1);
+  return Math.min(Math.floor(clamped * max), max - 1) + 1;
 }
 
 export { cycleBoardSize, getBoardRangeLabel };
