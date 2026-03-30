@@ -1,3 +1,4 @@
+import { BOARD_SIZES } from '../game/config';
 import type { PlayMode } from '../game/state';
 import type { BoardSize } from '../game/types';
 
@@ -27,12 +28,12 @@ export function ControlPanel({
   return (
     <section className="control-panel" aria-label="Game controls">
       <div className="board-size-row" role="group" aria-label="Board size">
-        {[2, 3, 4].map((size) => (
+        {BOARD_SIZES.map((size) => (
           <button
             key={size}
             type="button"
             className={boardSize === size ? 'chip chip--active' : 'chip'}
-            onClick={() => onSelectBoardSize(size as BoardSize)}
+            onClick={() => onSelectBoardSize(size)}
             disabled={blocked}
           >
             {size}x{size}

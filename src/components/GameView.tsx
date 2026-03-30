@@ -1,6 +1,7 @@
 import { computeCurrentSum, getBoardRangeLabel, randomTarget } from '../game/board';
 import { useBalancedTernaryGame } from '../game/useBalancedTernaryGame';
 import type { GameState } from '../game/state';
+import type { BoardSize } from '../game/types';
 import { BoardGrid } from './BoardGrid';
 import { ControlPanel } from './ControlPanel';
 import { StatusStrip } from './StatusStrip';
@@ -9,6 +10,14 @@ export function GameView({ initialState }: { initialState?: GameState }) {
   const game = useBalancedTernaryGame(initialState);
   const currentSum = computeCurrentSum(game.state.cells);
   const blocked = game.state.status === 'celebrating';
+  const handleSelectBoardSize = (boardSize: BoardSize) => {
+    if (game.state.playMode === 'random') {
+      game.selectBoardSize(boardSize, randomTarget(boardSize));
+      return;
+    }
+
+    game.selectBoardSize(boardSize);
+  };
   const completeCelebration = () => {
     if (game.state.playMode === 'random') {
       game.finishCelebrationRandom(randomTarget(game.state.boardSize));
@@ -32,7 +41,7 @@ export function GameView({ initialState }: { initialState?: GameState }) {
         draftTarget={game.state.draftTarget}
         placeholder={getBoardRangeLabel(game.state.boardSize)}
         blocked={blocked}
-        onSelectBoardSize={(boardSize) => game.selectBoardSize(boardSize, randomTarget(boardSize))}
+        onSelectBoardSize={handleSelectBoardSize}
         onEnableRandomMode={() =>
           game.enableRandomMode({
             2: randomTarget(2),
