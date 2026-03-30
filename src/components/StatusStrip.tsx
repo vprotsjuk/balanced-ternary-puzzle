@@ -11,7 +11,7 @@ export function StatusStrip({
   currentSum: number;
 }) {
   return (
-    <section className="status-strip status-strip--compact" aria-label="Game status">
+    <section className="status-strip" aria-label="Game status">
       <article className="status-card">
         <span className="status-label">Target</span>
         <strong className="status-value">

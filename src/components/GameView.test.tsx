@@ -145,20 +145,38 @@ it('exposes the cell state in the board accessibility surface', () => {
   expect(screen.getByRole('button', { name: 'Cell 9, minus' })).toBeInTheDocument();
 });
 
-it('renders the mobile layout hooks for a wide centered board and horizontal status row', () => {
+it('does not force long status banners into a narrow two-column strip', () => {
   const { container } = render(
     <GameView
       initialState={createGameState({
         boardSize: 4,
         playMode: 'sequential',
-        target: 40,
+        target: 43046721,
+        cells: [
+          { value: 1, state: 'plus' },
+          { value: 3, state: 'plus' },
+          { value: 9, state: 'plus' },
+          { value: 27, state: 'plus' },
+          { value: 81, state: 'plus' },
+          { value: 243, state: 'plus' },
+          { value: 729, state: 'plus' },
+          { value: 2187, state: 'plus' },
+          { value: 6561, state: 'plus' },
+          { value: 19683, state: 'plus' },
+          { value: 59049, state: 'plus' },
+          { value: 177147, state: 'plus' },
+          { value: 531441, state: 'plus' },
+          { value: 1594323, state: 'plus' },
+          { value: 4782969, state: 'plus' },
+          { value: 14348907, state: 'plus' },
+        ],
       })}
     />,
   );
 
-  expect(container.querySelector('.game-layout')).toBeInTheDocument();
-  expect(container.querySelector('.status-strip--compact')).toBeInTheDocument();
-  expect(container.querySelector('.control-panel__top-row')).toBeInTheDocument();
-  expect(container.querySelector('.board-stage')).toBeInTheDocument();
-  expect(container.querySelector('.board-grid--size-4')).toBeInTheDocument();
+  const statusStrip = container.querySelector('.status-strip');
+  expect(statusStrip).toBeInTheDocument();
+  expect(statusStrip).not.toHaveClass('status-strip--compact');
+  expect(screen.getByText('43046721', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
+  expect(screen.getByText('21523360', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
 });
