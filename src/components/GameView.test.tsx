@@ -58,6 +58,12 @@ it('locks controls while celebrating until continue completes the round', () => 
         playMode: 'random',
         target: 7,
         status: 'celebrating',
+        cells: [
+          { value: 1, state: 'plus' },
+          { value: 3, state: 'minus' },
+          { value: 9, state: 'neutral' },
+          { value: 27, state: 'neutral' },
+        ],
       })}
     />,
   );
@@ -68,4 +74,27 @@ it('locks controls while celebrating until continue completes the round', () => 
   expect(screen.getByRole('button', { name: '4x4' })).toBeDisabled();
   expect(screen.getByRole('button', { name: 'Enter' })).toBeDisabled();
   expect(screen.getByRole('button', { name: 'Random ON' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Cell 1, plus' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Cell 3, minus' })).toBeDisabled();
+});
+
+it('exposes the cell state in the board accessibility surface', () => {
+  render(
+    <GameView
+      initialState={createGameState({
+        boardSize: 2,
+        playMode: 'sequential',
+        target: 7,
+        cells: [
+          { value: 1, state: 'neutral' },
+          { value: 3, state: 'plus' },
+          { value: 9, state: 'minus' },
+          { value: 27, state: 'neutral' },
+        ],
+      })}
+    />,
+  );
+
+  expect(screen.getByRole('button', { name: 'Cell 3, plus' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Cell 9, minus' })).toBeInTheDocument();
 });

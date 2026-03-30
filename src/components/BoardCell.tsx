@@ -15,8 +15,7 @@ export function BoardCell({
     <button
       type="button"
       className={`board-cell board-cell--${state}`}
-      aria-pressed={state !== 'neutral'}
-      aria-label={`Cell ${value}`}
+      aria-label={`Cell ${value}, ${state}`}
       disabled={disabled}
       onClick={onPress}
     >

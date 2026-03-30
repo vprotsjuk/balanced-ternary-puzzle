@@ -21,8 +21,10 @@ it('renders cells in row-major order and forwards taps by index', async () => {
     />,
   );
 
-  expect(screen.getByRole('button', { name: 'Cell 1' })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Cell 27' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Cell 1, neutral' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Cell 3, plus' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Cell 9, minus' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Cell 27, neutral' })).toBeInTheDocument();
   expect(screen.getAllByRole('button')).toHaveLength(4);
   expect(screen.getAllByRole('button').map((button) => button.textContent)).toEqual([
     '1',
@@ -31,6 +33,6 @@ it('renders cells in row-major order and forwards taps by index', async () => {
     '27',
   ]);
 
-  await user.click(screen.getByRole('button', { name: 'Cell 3' }));
+  await user.click(screen.getByRole('button', { name: 'Cell 3, plus' }));
   expect(onCellTap).toHaveBeenCalledWith(1);
 });
