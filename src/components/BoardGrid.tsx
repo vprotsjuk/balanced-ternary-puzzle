@@ -16,6 +16,7 @@ export function BoardGrid({
     <section
       className="board-grid"
       aria-label={`Board ${boardSize} by ${boardSize}`}
+      aria-disabled={blocked}
       style={{ ['--board-size' as string]: String(boardSize) }}
     >
       {cells.map((cell, index) => (

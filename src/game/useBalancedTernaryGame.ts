@@ -1,7 +1,10 @@
-import { useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
+import { randomTarget } from './board';
 import { gameReducer } from './reducer';
 import { createGameState, type GameState } from './state';
 import type { BoardSize } from './types';
+
+export const CELEBRATION_DURATION_MS = 1000;
 
 export function useBalancedTernaryGame(initialState?: GameState) {
   const [state, dispatch] = useReducer(
@@ -9,6 +12,23 @@ export function useBalancedTernaryGame(initialState?: GameState) {
     initialState,
     (state) => state ?? createGameState(),
   );
+
+  useEffect(() => {
+    if (state.status !== 'celebrating') {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (state.playMode === 'random') {
+        dispatch({ type: 'round/finished', nextTarget: randomTarget(state.boardSize) });
+        return;
+      }
+
+      dispatch({ type: 'round/finished' });
+    }, CELEBRATION_DURATION_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [state.boardSize, state.playMode, state.status]);
 
   return {
     state,

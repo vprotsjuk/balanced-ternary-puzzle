@@ -29,6 +29,15 @@ export type GameAction =
   | { type: 'cell/tapped'; index: number }
   | { type: 'round/finished'; nextTarget?: number };
 
+function advanceSequentialRound(state: GameState): GameState {
+  const maxForBoard = BOARD_MAX_BY_SIZE[state.boardSize];
+  if (state.target < maxForBoard) {
+    return resetRound(state.boardSize, 'sequential', state.target + 1);
+  }
+
+  return resetRound(cycleBoardSize(state.boardSize), 'sequential', 1);
+}
+
 export function gameReducer(state: GameState, action: GameAction): GameState {
   if (action.type === 'round/finished' && state.status !== 'celebrating') {
     return state;
@@ -98,13 +107,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         );
       }
 
-      const maxForBoard = BOARD_MAX_BY_SIZE[state.boardSize];
-      if (state.target < maxForBoard) {
-        return resetRound(state.boardSize, 'sequential', state.target + 1);
-      }
-
-      const nextBoardSize = cycleBoardSize(state.boardSize);
-      return resetRound(nextBoardSize, 'sequential', 1);
+      return advanceSequentialRound(state);
     }
   }
 }

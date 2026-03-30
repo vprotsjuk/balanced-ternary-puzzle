@@ -26,7 +26,7 @@ export function ControlPanel({
   onSubmitTarget: (raw: string) => void;
 }) {
   return (
-    <section className="control-panel" aria-label="Game controls">
+    <section className="control-panel" aria-label="Game controls" aria-disabled={blocked}>
       <div className="board-size-row" role="group" aria-label="Board size">
         {BOARD_SIZES.map((size) => (
           <button
