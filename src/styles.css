@@ -1,7 +1,8 @@
 :root {
   font-family: Inter, system-ui, sans-serif;
-  color: #151515;
-  background: #f7f3ec;
+  color: #141414;
+  background:
+    radial-gradient(circle at top, #fff8ed 0%, #f5efe5 50%, #e8dfd1 100%);
 }
 
 * {
@@ -14,19 +15,136 @@ body {
   min-height: 100vh;
 }
 
+button,
+input {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+input {
+  border: 0;
+}
+
 #root {
   min-height: 100vh;
 }
 
 .app-shell {
-  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  gap: 0.875rem;
   padding: 1rem;
+  max-width: 34rem;
+  margin: 0 auto;
 }
 
 .app-title {
   margin: 0 0 0.5rem;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
 }
 
-.app-subtitle {
-  margin: 0;
+.status-strip,
+.control-panel {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.status-card,
+.control-panel,
+.board-grid {
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 30px rgba(43, 34, 20, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.status-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.95rem 1rem;
+}
+
+.status-label,
+.target-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6f6254;
+}
+
+.status-value {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.status-meta {
+  color: #857869;
+  font-size: 0.92rem;
+}
+
+.board-size-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.chip,
+.random-toggle,
+.target-entry-row button {
+  min-height: 3rem;
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+}
+
+.chip {
+  background: #f0e6d8;
+  color: #41362b;
+}
+
+.chip--active,
+.random-toggle {
+  background: #1f1a16;
+  color: #fff;
+}
+
+.target-entry {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.target-entry-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.target-entry-row input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.95rem;
+  background: #fff;
+  color: #141414;
+}
+
+.target-entry-row button {
+  background: #f0e6d8;
+  color: #41362b;
+}
+
+.board-grid {
+  min-height: 10rem;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.board-grid__placeholder {
+  color: #766858;
 }
