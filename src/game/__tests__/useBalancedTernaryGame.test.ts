@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
+import { randomTarget } from '../board';
 import { createGameState } from '../state';
 import { useBalancedTernaryGame } from '../useBalancedTernaryGame';
 
@@ -28,5 +29,37 @@ describe('useBalancedTernaryGame', () => {
     expect(result.current.state.status).toBe('playing');
     expect(result.current.state.playMode).toBe('random');
     expect(result.current.state.target).toBe(21);
+  });
+
+  it('keeps the selected board size and target aligned when random mode toggles before selection', () => {
+    const rng = () => 0.5;
+    const expectedTarget = randomTarget(3, rng);
+    const initialState = createGameState({ boardSize: 2, playMode: 'sequential', target: 1 });
+    const { result } = renderHook(() => useBalancedTernaryGame(initialState, rng));
+
+    act(() => {
+      result.current.setRandomMode(true);
+      result.current.selectBoardSize(3);
+    });
+
+    expect(result.current.state.boardSize).toBe(3);
+    expect(result.current.state.playMode).toBe('random');
+    expect(result.current.state.target).toBe(expectedTarget);
+  });
+
+  it('keeps the selected board size and target aligned when board selection happens before random mode toggles', () => {
+    const rng = () => 0.5;
+    const expectedTarget = randomTarget(3, rng);
+    const initialState = createGameState({ boardSize: 2, playMode: 'sequential', target: 1 });
+    const { result } = renderHook(() => useBalancedTernaryGame(initialState, rng));
+
+    act(() => {
+      result.current.selectBoardSize(3);
+      result.current.setRandomMode(true);
+    });
+
+    expect(result.current.state.boardSize).toBe(3);
+    expect(result.current.state.playMode).toBe('random');
+    expect(result.current.state.target).toBe(expectedTarget);
   });
 });

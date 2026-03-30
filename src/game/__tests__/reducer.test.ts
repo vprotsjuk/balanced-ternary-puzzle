@@ -61,7 +61,10 @@ describe('game reducer', () => {
 
   it('starts a fresh random round after celebration in random mode', () => {
     const state = createGameState({ boardSize: 2, playMode: 'random', target: 7, status: 'celebrating' });
-    const next = gameReducer(state, { type: 'round/finished', nextTarget: 21 });
+    const next = gameReducer(state, {
+      type: 'round/finished',
+      nextTargets: { 2: 21, 3: 4921, 4: 10761681 },
+    });
 
     expect(next.status).toBe('playing');
     expect(next.playMode).toBe('random');

@@ -5,11 +5,15 @@ import type { BoardSize } from './types';
 
 export type GameAction =
   | { type: 'board/selected'; boardSize: BoardSize; nextTarget?: number }
-  | { type: 'mode/toggled'; enabled: boolean; nextTarget?: number }
+  | {
+      type: 'mode/toggled';
+      enabled: boolean;
+      nextTargets?: Record<BoardSize, number>;
+    }
   | { type: 'draft/changed'; value: string }
   | { type: 'target/submitted'; raw: string }
   | { type: 'cell/tapped'; index: number }
-  | { type: 'round/finished'; nextTarget?: number };
+  | { type: 'round/finished'; nextTargets?: Record<BoardSize, number> };
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   if (action.type === 'round/finished' && state.status !== 'celebrating') {
@@ -37,11 +41,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         return { ...state, playMode: 'sequential' };
       }
 
-      if (typeof action.nextTarget !== 'number') {
-        throw new Error('Missing nextTarget for random mode toggle');
+      if (!action.nextTargets) {
+        throw new Error('Missing nextTargets for random mode toggle');
       }
 
-      return resetRound(state.boardSize, 'random', action.nextTarget);
+      return resetRound(state.boardSize, 'random', action.nextTargets[state.boardSize]);
     }
     case 'draft/changed':
       return { ...state, draftTarget: action.value };
@@ -65,11 +69,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
     case 'round/finished': {
       if (state.playMode === 'random') {
-        if (typeof action.nextTarget !== 'number') {
-          throw new Error('Missing nextTarget for random round completion');
+        if (!action.nextTargets) {
+          throw new Error('Missing nextTargets for random round completion');
         }
 
-        return resetRound(state.boardSize, 'random', action.nextTarget);
+        return resetRound(state.boardSize, 'random', action.nextTargets[state.boardSize]);
       }
 
       const maxForBoard = BOARD_MAX_BY_SIZE[state.boardSize];
