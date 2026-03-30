@@ -42,18 +42,27 @@ function requireCellValue(value: Cell['value']): number {
   return value;
 }
 
+function requireCellEntry(cell: unknown): Cell {
+  if (cell === null || typeof cell !== 'object' || Array.isArray(cell)) {
+    throw new Error(`Invalid cell entry: ${cell}`);
+  }
+  return cell as Cell;
+}
+
 export function computeCurrentSum(cells: Cell[]): number {
   return cells.reduce((sum, cell) => {
-    const value = requireCellValue(cell.value);
-    if (cell.state === 'plus') return sum + value;
-    if (cell.state === 'minus') return sum - value;
-    if (cell.state === 'neutral') return sum;
-    throw new Error(`Invalid cell state: ${cell.state}`);
+    const entry = requireCellEntry(cell);
+    const value = requireCellValue(entry.value);
+    if (entry.state === 'plus') return sum + value;
+    if (entry.state === 'minus') return sum - value;
+    if (entry.state === 'neutral') return sum;
+    throw new Error(`Invalid cell state: ${entry.state}`);
   }, 0);
 }
 
 export function parseManualTarget(raw: string, size: BoardSize): number | null {
   const max = BOARD_MAX_BY_SIZE[requireBoardSize(size)];
+  if (typeof raw !== 'string') return null;
   const trimmed = raw.trim();
   if (!/^[0-9]+$/.test(trimmed)) return null;
   const value = Number(trimmed);

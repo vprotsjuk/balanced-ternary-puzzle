@@ -68,6 +68,12 @@ describe('board utilities', () => {
     expect(parseManualTarget('9842', 3)).toBeNull();
   });
 
+  it('rejects non-string manual target input instead of trimming it', () => {
+    expect(parseManualTarget(42 as never, 3)).toBeNull();
+    expect(parseManualTarget(null as never, 3)).toBeNull();
+    expect(parseManualTarget(undefined as never, 3)).toBeNull();
+  });
+
   it('cycles board sizes in the documented order', () => {
     expect(cycleBoardSize(2)).toBe(3);
     expect(cycleBoardSize(3)).toBe(4);
@@ -100,6 +106,14 @@ describe('board utilities', () => {
     expect(() =>
       computeCurrentSum([{ value: 1, state: 'broken' as never }]),
     ).toThrow('Invalid cell state: broken');
+  });
+
+  it('rejects non-object cell entries instead of touching their fields', () => {
+    expect(() => computeCurrentSum([null as never])).toThrow('Invalid cell entry: null');
+    expect(() => computeCurrentSum([undefined as never])).toThrow(
+      'Invalid cell entry: undefined',
+    );
+    expect(() => computeCurrentSum(['oops' as never])).toThrow('Invalid cell entry: oops');
   });
 
   it('rejects malformed runtime cell values instead of producing nonsense', () => {
