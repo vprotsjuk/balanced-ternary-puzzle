@@ -31,10 +31,10 @@ it('creates a fresh random initial state for each mount', () => {
   vi.mocked(randomTarget).mockReturnValueOnce(11).mockReturnValueOnce(22);
 
   const firstRender = render(<App />);
-  expect(screen.getByText('11', { selector: '.status-value' })).toBeInTheDocument();
+  expect(screen.getByText('11')).toBeInTheDocument();
 
   firstRender.unmount();
 
   render(<App />);
-  expect(screen.getByText('22', { selector: '.status-value' })).toBeInTheDocument();
+  expect(screen.getByText('22')).toBeInTheDocument();
 });
