@@ -1,4 +1,5 @@
 import type { CellState } from '../game/types';
+import { AdaptiveNumber } from './AdaptiveNumber';
 
 export function BoardCell({
   value,
@@ -19,7 +20,7 @@ export function BoardCell({
       disabled={disabled}
       onClick={onPress}
     >
-      {value}
+      <AdaptiveNumber value={value} mode="cell" />
     </button>
   );
 }

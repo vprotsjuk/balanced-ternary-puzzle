@@ -79,8 +79,10 @@ input {
 }
 
 .status-value {
+  display: block;
   font-size: 2rem;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .status-meta {
@@ -149,6 +151,8 @@ input {
 }
 
 .board-cell {
+  display: grid;
+  place-items: center;
   border: 0;
   border-radius: 1rem;
   background: #fffaf2;
@@ -158,6 +162,7 @@ input {
   color: #41362b;
   font-size: clamp(1rem, 4vw, 1.5rem);
   font-weight: 700;
+  text-align: center;
 }
 
 .board-cell--plus {
@@ -166,4 +171,30 @@ input {
 
 .board-cell--minus {
   background: #f8e4e2;
+}
+
+.adaptive-number {
+  display: block;
+  width: 100%;
+}
+
+.adaptive-number--banner {
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.adaptive-number--cell {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  line-height: 0.92;
+}
+
+.adaptive-number__line {
+  display: block;
+}
+
+.adaptive-number__line-break {
+  display: none;
 }
