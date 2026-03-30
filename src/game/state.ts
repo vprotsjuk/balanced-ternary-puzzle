@@ -1,4 +1,4 @@
-import { createNeutralCells, randomTarget } from './board';
+import { createNeutralCells } from './board';
 import type { BoardSize, Cell } from './types';
 
 export type PlayMode = 'random' | 'sequential';
@@ -16,7 +16,7 @@ export interface GameState {
 export function createGameState(overrides: Partial<GameState> = {}): GameState {
   const boardSize = overrides.boardSize ?? 2;
   const playMode = overrides.playMode ?? 'random';
-  const target = overrides.target ?? (playMode === 'sequential' ? 1 : randomTarget(boardSize));
+  const target = overrides.target ?? 1;
 
   return {
     draftTarget: '',

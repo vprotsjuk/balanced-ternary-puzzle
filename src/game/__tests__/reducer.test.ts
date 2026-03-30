@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import { computeCurrentSum } from '../board';
 import { gameReducer } from '../reducer';
 import { createGameState } from '../state';
@@ -61,16 +60,8 @@ describe('game reducer', () => {
   });
 
   it('starts a fresh random round after celebration in random mode', () => {
-    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const state = createGameState({ boardSize: 2, playMode: 'random', target: 7, status: 'celebrating' });
-
-    const next = (() => {
-      try {
-        return gameReducer(state, { type: 'round/finished' });
-      } finally {
-        randomSpy.mockRestore();
-      }
-    })();
+    const next = gameReducer(state, { type: 'round/finished', nextTarget: 21 });
 
     expect(next.status).toBe('playing');
     expect(next.playMode).toBe('random');
