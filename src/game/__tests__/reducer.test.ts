@@ -87,4 +87,30 @@ describe('game reducer', () => {
     expect(next.boardSize).toBe(2);
     expect(next.target).toBe(8);
   });
+
+  it('rolls over to the next board size after finishing the sequential board maximum', () => {
+    const state = createGameState({ boardSize: 2, playMode: 'sequential', target: 40, status: 'celebrating' });
+    const next = gameReducer(state, { type: 'round/finished' });
+
+    expect(next.status).toBe('playing');
+    expect(next.playMode).toBe('sequential');
+    expect(next.boardSize).toBe(3);
+    expect(next.target).toBe(1);
+    expect(computeCurrentSum(next.cells)).toBe(0);
+  });
+
+  it('enters celebrating on a winning tap and blocks later actions until the round finishes', () => {
+    const winningState = createGameState({ boardSize: 2, playMode: 'sequential', target: 1 });
+    const celebratingState = gameReducer(winningState, { type: 'cell/tapped', index: 0 });
+
+    expect(celebratingState.status).toBe('celebrating');
+
+    const blockedBoardChange = gameReducer(celebratingState, { type: 'board/selected', boardSize: 3 });
+    const blockedModeToggle = gameReducer(celebratingState, { type: 'mode/toggled', enabled: false });
+    const blockedTap = gameReducer(celebratingState, { type: 'cell/tapped', index: 1 });
+
+    expect(blockedBoardChange).toBe(celebratingState);
+    expect(blockedModeToggle).toBe(celebratingState);
+    expect(blockedTap).toBe(celebratingState);
+  });
 });
