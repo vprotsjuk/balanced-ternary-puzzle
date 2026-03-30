@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { chooseBestTwoLineSplit, type MeasureText } from './numberLayout';
 
 type AdaptiveNumberProps = {
@@ -20,18 +20,25 @@ export function AdaptiveNumber({
 }: AdaptiveNumberProps) {
   const text = String(value);
   const elementRef = useRef<HTMLSpanElement | null>(null);
-  const measureRef = useRef<MeasureText | null>(null);
-  const [availableWidth, setAvailableWidth] = useState(maxWidth ?? 0);
+  const canvasMeasureRef = useRef<MeasureText | null>(null);
+  const isCellMode = mode === 'cell';
+  const [availableWidth, setAvailableWidth] = useState<number | null>(
+    isCellMode ? maxWidth ?? null : null,
+  );
 
-  if (measureRef.current === null) {
-    measureRef.current = createCanvasMeasure(() => elementRef.current);
+  if (isCellMode && canvasMeasureRef.current === null) {
+    canvasMeasureRef.current = createCanvasMeasure(() => elementRef.current);
   }
 
-  const measureText = measure ?? measureRef.current;
+  const measureText = measure ?? canvasMeasureRef.current;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (!isCellMode) {
+      return undefined;
+    }
+
     if (typeof maxWidth === 'number') {
-      setAvailableWidth(maxWidth);
+      setAvailableWidth((currentWidth) => (currentWidth === maxWidth ? currentWidth : maxWidth));
       return undefined;
     }
 
@@ -41,7 +48,8 @@ export function AdaptiveNumber({
     }
 
     const updateWidth = () => {
-      setAvailableWidth(element.getBoundingClientRect().width);
+      const nextWidth = element.getBoundingClientRect().width;
+      setAvailableWidth((currentWidth) => (currentWidth === nextWidth ? currentWidth : nextWidth));
     };
 
     updateWidth();
@@ -59,10 +67,12 @@ export function AdaptiveNumber({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [maxWidth, text]);
+  }, [isCellMode, maxWidth, text]);
 
   const split =
-    mode === 'cell' ? chooseBestTwoLineSplit(text, measureText, availableWidth) : null;
+    isCellMode && measureText && availableWidth !== null
+      ? chooseBestTwoLineSplit(text, measureText, availableWidth)
+      : null;
 
   return (
     <span
