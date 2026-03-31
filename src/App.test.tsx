@@ -14,6 +14,13 @@ import App from './App';
 
 afterEach(() => cleanup());
 
+function getStatusValue(label: string) {
+  return screen
+    .getByText(label)
+    .closest('.status-card')
+    ?.querySelector('.adaptive-number--banner')?.textContent;
+}
+
 it('renders the mobile shell with board size buttons, displays, and input controls', () => {
   render(<App />);
 
@@ -31,10 +38,10 @@ it('creates a fresh random initial state for each mount', () => {
   vi.mocked(randomTarget).mockReturnValueOnce(11).mockReturnValueOnce(22);
 
   const firstRender = render(<App />);
-  expect(screen.getByText('11')).toBeInTheDocument();
+  expect(getStatusValue('Target')).toBe('11');
 
   firstRender.unmount();
 
   render(<App />);
-  expect(screen.getByText('22')).toBeInTheDocument();
+  expect(getStatusValue('Target')).toBe('22');
 });
