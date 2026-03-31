@@ -5,17 +5,19 @@ export function BoardCell({
   value,
   state,
   disabled,
+  flash,
   onPress,
 }: {
   value: number;
   state: CellState;
   disabled: boolean;
+  flash: boolean;
   onPress: () => void;
 }) {
   return (
     <button
       type="button"
-      className={`board-cell board-cell--${state}`}
+      className={`board-cell board-cell--${state}${flash ? ' board-cell--flash' : ''}`}
       aria-label={`Cell ${value}, ${state}`}
       disabled={disabled}
       onClick={onPress}

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { computeCurrentSum, getBoardRangeLabel, randomTarget } from '../game/board';
 import { useBalancedTernaryGame } from '../game/useBalancedTernaryGame';
 import type { GameState } from '../game/state';
@@ -6,10 +7,28 @@ import { BoardGrid } from './BoardGrid';
 import { ControlPanel } from './ControlPanel';
 import { StatusStrip } from './StatusStrip';
 
+const CELEBRATION_FLASH_MS = 500;
+
 export function GameView({ initialState }: { initialState?: GameState }) {
   const game = useBalancedTernaryGame(initialState);
   const currentSum = computeCurrentSum(game.state.cells);
   const blocked = game.state.status === 'celebrating';
+  const [flashActive, setFlashActive] = useState(blocked);
+
+  useEffect(() => {
+    if (!blocked) {
+      setFlashActive(false);
+      return undefined;
+    }
+
+    setFlashActive(true);
+
+    const timeoutId = window.setTimeout(() => {
+      setFlashActive(false);
+    }, CELEBRATION_FLASH_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [blocked]);
 
   const handleSelectBoardSize = (boardSize: BoardSize) => {
     if (game.state.playMode === 'random') {
@@ -28,6 +47,7 @@ export function GameView({ initialState }: { initialState?: GameState }) {
           boardSize={game.state.boardSize}
           target={game.state.target}
           currentSum={currentSum}
+          flash={flashActive}
         />
         <ControlPanel
           boardSize={game.state.boardSize}
@@ -52,6 +72,7 @@ export function GameView({ initialState }: { initialState?: GameState }) {
             boardSize={game.state.boardSize}
             cells={game.state.cells}
             blocked={blocked}
+            flash={flashActive}
             onCellTap={game.tapCell}
           />
         </div>

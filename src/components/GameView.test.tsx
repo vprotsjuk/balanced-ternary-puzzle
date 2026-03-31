@@ -124,6 +124,50 @@ it('locks a winning sequential round for one second and then advances to the nex
   expect(screen.getByRole('button', { name: 'Cell 1, neutral' })).not.toBeDisabled();
 });
 
+it('keeps the celebration flash active for half a second across status cards and board cells', () => {
+  vi.useFakeTimers();
+
+  render(
+    <GameView
+      initialState={createGameState({
+        boardSize: 2,
+        playMode: 'sequential',
+        target: 1,
+        status: 'celebrating',
+        cells: [
+          { value: 1, state: 'plus' },
+          { value: 3, state: 'neutral' },
+          { value: 9, state: 'neutral' },
+          { value: 27, state: 'neutral' },
+        ],
+      })}
+    />,
+  );
+
+  expect(screen.getByText('Target').closest('.status-card')).toHaveClass('status-card--flash');
+  expect(screen.getByText('Current Sum').closest('.status-card')).toHaveClass('status-card--flash');
+  expect(screen.getByLabelText('Board 2 by 2')).toHaveClass('board-grid--flash');
+  expect(screen.getByRole('button', { name: 'Cell 1, plus' })).toHaveClass('board-cell--flash');
+
+  act(() => {
+    vi.advanceTimersByTime(499);
+  });
+
+  expect(screen.getByText('Target').closest('.status-card')).toHaveClass('status-card--flash');
+  expect(screen.getByRole('button', { name: 'Cell 1, plus' })).toHaveClass('board-cell--flash');
+  expect(screen.getByRole('button', { name: '2x2' })).toBeDisabled();
+
+  act(() => {
+    vi.advanceTimersByTime(1);
+  });
+
+  expect(screen.getByText('Target').closest('.status-card')).not.toHaveClass('status-card--flash');
+  expect(screen.getByText('Current Sum').closest('.status-card')).not.toHaveClass('status-card--flash');
+  expect(screen.getByLabelText('Board 2 by 2')).not.toHaveClass('board-grid--flash');
+  expect(screen.getByRole('button', { name: 'Cell 1, plus' })).not.toHaveClass('board-cell--flash');
+  expect(screen.getByRole('button', { name: '2x2' })).toBeDisabled();
+});
+
 it('exposes the cell state in the board accessibility surface', () => {
   render(
     <GameView

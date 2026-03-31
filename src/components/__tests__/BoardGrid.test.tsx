@@ -17,6 +17,7 @@ it('renders cells in row-major order and forwards taps by index', async () => {
         { value: 27, state: 'neutral' },
       ]}
       blocked={false}
+      flash={false}
       onCellTap={onCellTap}
     />,
   );

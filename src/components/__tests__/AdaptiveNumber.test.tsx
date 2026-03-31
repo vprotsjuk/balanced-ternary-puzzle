@@ -73,6 +73,21 @@ it('splits cell numbers across two lines when needed for fit', () => {
   expect(screen.getByTestId('adaptive-number-line-break')).toBeInTheDocument();
 });
 
+it('adds subtle grouped-digit wrappers for longer cell numbers', () => {
+  const { container } = render(
+    <AdaptiveNumber
+      value={14348907}
+      mode="cell"
+      maxWidth={140}
+      measure={(part) => part.length * 10}
+    />,
+  );
+
+  expect(
+    Array.from(container.querySelectorAll('.adaptive-number__group')).map((node) => node.textContent),
+  ).toEqual(['14', '348', '907']);
+});
+
 it('renders the cell split during the initial commit when measured width is narrow', () => {
   const observe = vi.fn();
   const disconnect = vi.fn();

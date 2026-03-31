@@ -82,20 +82,55 @@ export function AdaptiveNumber({
         .join(' ')}
     >
       {split === null ? (
-        text
+        renderFormattedLine(text, isCellMode)
       ) : (
         <>
-          <span className="adaptive-number__line">{split[0]}</span>
+          <span className="adaptive-number__line">{renderFormattedLine(split[0], true)}</span>
           <span
             aria-hidden="true"
             className="adaptive-number__line-break"
             data-testid="adaptive-number-line-break"
           />
-          <span className="adaptive-number__line">{split[1]}</span>
+          <span className="adaptive-number__line">{renderFormattedLine(split[1], true)}</span>
         </>
       )}
     </span>
   );
+}
+
+function renderFormattedLine(text: string, grouped: boolean) {
+  if (!grouped) {
+    return text;
+  }
+
+  const groups = groupDigits(text);
+
+  if (groups.length === 1) {
+    return text;
+  }
+
+  return groups.map((group, index) => (
+    <span key={`${group}-${index}`} className="adaptive-number__group">
+      {group}
+    </span>
+  ));
+}
+
+function groupDigits(text: string) {
+  if (text.length < 5) {
+    return [text];
+  }
+
+  const groups: string[] = [];
+  let index = text.length;
+
+  while (index > 0) {
+    const nextIndex = Math.max(0, index - 3);
+    groups.unshift(text.slice(nextIndex, index));
+    index = nextIndex;
+  }
+
+  return groups;
 }
 
 function createCanvasMeasure(getElement: () => HTMLElement | null): MeasureText {
