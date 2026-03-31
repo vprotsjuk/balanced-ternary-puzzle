@@ -45,7 +45,7 @@ it('chooses the most balanced two-line split when a single line does not fit', (
 });
 
 it('keeps banner numbers on a single line even in a narrow width', () => {
-  render(
+  const { container } = render(
     <AdaptiveNumber
       value={59049}
       mode="banner"
@@ -54,7 +54,24 @@ it('keeps banner numbers on a single line even in a narrow width', () => {
     />,
   );
 
-  expect(screen.getByText('59049')).toBeInTheDocument();
+  expect(container.querySelector('.adaptive-number--banner')?.textContent).toBe('59·049');
+  expect(screen.queryByTestId('adaptive-number-line-break')).not.toBeInTheDocument();
+});
+
+it('renders grouped separators for banner numbers without introducing a line break', () => {
+  const { container } = render(
+    <AdaptiveNumber
+      value={43046721}
+      mode="banner"
+      maxWidth={20}
+      measure={(part) => part.length * 10}
+    />,
+  );
+
+  expect(
+    Array.from(container.querySelectorAll('.adaptive-number__group')).map((node) => node.textContent),
+  ).toEqual(['43', '046', '721']);
+  expect(container.querySelectorAll('.adaptive-number__separator')).toHaveLength(2);
   expect(screen.queryByTestId('adaptive-number-line-break')).not.toBeInTheDocument();
 });
 

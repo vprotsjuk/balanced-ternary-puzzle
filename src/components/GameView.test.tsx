@@ -13,6 +13,14 @@ vi.mock('../game/board', async () => {
 import { randomTarget } from '../game/board';
 import { GameView } from './GameView';
 
+function getStatusCard(label: string) {
+  return screen.getByText(label).closest('.status-card');
+}
+
+function getStatusValue(label: string) {
+  return getStatusCard(label)?.querySelector('.adaptive-number--banner')?.textContent;
+}
+
 afterEach(() => {
   vi.useRealTimers();
   cleanup();
@@ -21,7 +29,11 @@ afterEach(() => {
 
 it('switches board sizes without RNG in sequential mode and only uses RNG in random mode', () => {
   const random = vi.mocked(randomTarget);
-  random.mockReturnValueOnce(11).mockReturnValueOnce(22).mockReturnValueOnce(33).mockReturnValueOnce(44);
+  random
+    .mockReturnValueOnce(11)
+    .mockReturnValueOnce(444)
+    .mockReturnValueOnce(4444)
+    .mockReturnValueOnce(54321);
 
   render(
     <GameView
@@ -39,14 +51,15 @@ it('switches board sizes without RNG in sequential mode and only uses RNG in ran
   expect(screen.getByText(/Board 3x3/)).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole('button', { name: 'Random OFF' }));
-  expect(screen.getByText('22', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
+  expect(getStatusValue('Target')).toBe('444');
+  expect(getStatusValue('Difference')).toBe('444');
 
   random.mockClear();
   fireEvent.click(screen.getByRole('button', { name: '4x4' }));
 
   expect(random).toHaveBeenCalledWith(4);
   expect(screen.getByText(/Board 4x4/)).toBeInTheDocument();
-  expect(screen.getByText('44', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
+  expect(getStatusValue('Target')).toBe('54·321');
 });
 
 it('locks controls for one second and then automatically starts the next random round', () => {
@@ -84,14 +97,14 @@ it('locks controls for one second and then automatically starts the next random 
   });
 
   expect(screen.getByRole('button', { name: '2x2' })).toBeDisabled();
-  expect(screen.getByText('7', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
+  expect(getStatusValue('Target')).toBe('7');
 
   act(() => {
     vi.advanceTimersByTime(1);
   });
 
   expect(randomTarget).toHaveBeenCalledWith(2);
-  expect(screen.getByText('21', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
+  expect(getStatusValue('Target')).toBe('21');
   expect(screen.getByRole('button', { name: '2x2' })).not.toBeDisabled();
   expect(screen.getByRole('button', { name: 'Cell 1, neutral' })).not.toBeDisabled();
 });
@@ -119,7 +132,7 @@ it('locks a winning sequential round for one second and then advances to the nex
     vi.advanceTimersByTime(1000);
   });
 
-  expect(screen.getByText('2', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
+  expect(getStatusValue('Target')).toBe('2');
   expect(screen.getByRole('button', { name: '2x2' })).not.toBeDisabled();
   expect(screen.getByRole('button', { name: 'Cell 1, neutral' })).not.toBeDisabled();
 });
@@ -146,6 +159,7 @@ it('keeps the celebration flash active for half a second across status cards and
 
   expect(screen.getByText('Target').closest('.status-card')).toHaveClass('status-card--flash');
   expect(screen.getByText('Current Sum').closest('.status-card')).toHaveClass('status-card--flash');
+  expect(getStatusCard('Difference')).toHaveClass('status-card--flash');
   expect(screen.getByLabelText('Board 2 by 2')).toHaveClass('board-grid--flash');
   expect(screen.getByRole('button', { name: 'Cell 1, plus' })).toHaveClass('board-cell--flash');
 
@@ -154,6 +168,7 @@ it('keeps the celebration flash active for half a second across status cards and
   });
 
   expect(screen.getByText('Target').closest('.status-card')).toHaveClass('status-card--flash');
+  expect(getStatusCard('Difference')).toHaveClass('status-card--flash');
   expect(screen.getByRole('button', { name: 'Cell 1, plus' })).toHaveClass('board-cell--flash');
   expect(screen.getByRole('button', { name: '2x2' })).toBeDisabled();
 
@@ -163,6 +178,7 @@ it('keeps the celebration flash active for half a second across status cards and
 
   expect(screen.getByText('Target').closest('.status-card')).not.toHaveClass('status-card--flash');
   expect(screen.getByText('Current Sum').closest('.status-card')).not.toHaveClass('status-card--flash');
+  expect(getStatusCard('Difference')).not.toHaveClass('status-card--flash');
   expect(screen.getByLabelText('Board 2 by 2')).not.toHaveClass('board-grid--flash');
   expect(screen.getByRole('button', { name: 'Cell 1, plus' })).not.toHaveClass('board-cell--flash');
   expect(screen.getByRole('button', { name: '2x2' })).toBeDisabled();
@@ -220,7 +236,31 @@ it('renders long 4x4 status values and labels for the game state', () => {
 
   expect(screen.getByText('Target')).toBeInTheDocument();
   expect(screen.getByText('Current Sum')).toBeInTheDocument();
+  expect(screen.getByText('Difference')).toBeInTheDocument();
   expect(screen.getByText('Board 4x4')).toBeInTheDocument();
-  expect(screen.getByText('43046721', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
-  expect(screen.getByText('21523360', { selector: '.adaptive-number--banner' })).toBeInTheDocument();
+  expect(getStatusValue('Target')).toBe('43·046·721');
+  expect(getStatusValue('Current Sum')).toBe('21·523·360');
+  expect(getStatusValue('Difference')).toBe('21·523·361');
+  expect(getStatusCard('Difference')).toHaveClass('status-card--positive');
+});
+
+it('renders a negative difference card in the red family when the current sum exceeds the target', () => {
+  render(
+    <GameView
+      initialState={createGameState({
+        boardSize: 2,
+        playMode: 'sequential',
+        target: 1,
+        cells: [
+          { value: 1, state: 'plus' },
+          { value: 3, state: 'plus' },
+          { value: 9, state: 'neutral' },
+          { value: 27, state: 'neutral' },
+        ],
+      })}
+    />,
+  );
+
+  expect(getStatusCard('Difference')).toHaveClass('status-card--negative');
+  expect(getStatusValue('Difference')).toBe('-3');
 });

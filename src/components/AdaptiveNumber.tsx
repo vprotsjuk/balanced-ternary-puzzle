@@ -82,7 +82,7 @@ export function AdaptiveNumber({
         .join(' ')}
     >
       {split === null ? (
-        renderFormattedLine(text, isCellMode)
+        renderFormattedLine(text, true)
       ) : (
         <>
           <span className="adaptive-number__line">{renderFormattedLine(split[0], true)}</span>
@@ -103,43 +103,53 @@ function renderFormattedLine(text: string, grouped: boolean) {
     return text;
   }
 
-  const groups = groupDigits(text);
+  const { sign, groups } = groupDigits(text);
 
   if (groups.length === 1) {
     return text;
   }
 
-  return groups.flatMap((group, index) => [
-    <span key={`${group}-${index}`} className="adaptive-number__group">
-      {group}
-    </span>,
-    index < groups.length - 1 ? (
-      <span
-        key={`separator-${group}-${index}`}
-        aria-hidden="true"
-        className="adaptive-number__separator"
-      >
-        ·
+  return [
+    sign ? (
+      <span key="sign" className="adaptive-number__sign">
+        {sign}
       </span>
     ) : null,
-  ]);
+    ...groups.flatMap((group, index) => [
+      <span key={`${group}-${index}`} className="adaptive-number__group">
+        {group}
+      </span>,
+      index < groups.length - 1 ? (
+        <span
+          key={`separator-${group}-${index}`}
+          aria-hidden="true"
+          className="adaptive-number__separator"
+        >
+          ·
+        </span>
+      ) : null,
+    ]),
+  ];
 }
 
 function groupDigits(text: string) {
-  if (text.length < 4) {
-    return [text];
+  const sign = text.startsWith('-') ? '-' : '';
+  const digits = sign ? text.slice(1) : text;
+
+  if (digits.length < 4) {
+    return { sign, groups: [digits] };
   }
 
   const groups: string[] = [];
-  let index = text.length;
+  let index = digits.length;
 
   while (index > 0) {
     const nextIndex = Math.max(0, index - 3);
-    groups.unshift(text.slice(nextIndex, index));
+    groups.unshift(digits.slice(nextIndex, index));
     index = nextIndex;
   }
 
-  return groups;
+  return { sign, groups };
 }
 
 function createCanvasMeasure(getElement: () => HTMLElement | null): MeasureText {
