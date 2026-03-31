@@ -3,6 +3,7 @@ import type { PlayMode } from '../game/state';
 import type { BoardSize } from '../game/types';
 
 export function ControlPanel({
+  layout = 'desktop',
   boardSize,
   playMode,
   draftTarget,
@@ -14,6 +15,7 @@ export function ControlPanel({
   onDraftChange,
   onSubmitTarget,
 }: {
+  layout?: 'desktop' | 'mobile';
   boardSize: BoardSize;
   playMode: PlayMode;
   draftTarget: string;
@@ -25,9 +27,25 @@ export function ControlPanel({
   onDraftChange: (value: string) => void;
   onSubmitTarget: (raw: string) => void;
 }) {
+  const randomToggle = (
+    <button
+      type="button"
+      className="random-toggle"
+      aria-pressed={playMode === 'random'}
+      onClick={() => (playMode === 'random' ? onDisableRandomMode() : onEnableRandomMode())}
+      disabled={blocked}
+    >
+      Random {playMode === 'random' ? 'ON' : 'OFF'}
+    </button>
+  );
+
   return (
-    <section className="control-panel" aria-label="Game controls" aria-disabled={blocked}>
-      <div className="control-panel__top-row">
+    <section
+      className={`control-panel control-panel--${layout}`}
+      aria-label="Game controls"
+      aria-disabled={blocked}
+    >
+      <div className={`control-panel__top-row control-panel__top-row--${layout}`}>
         <div className="board-size-row" role="group" aria-label="Board size">
           {BOARD_SIZES.map((size) => (
             <button
@@ -40,17 +58,9 @@ export function ControlPanel({
               {size}x{size}
             </button>
           ))}
+          {layout === 'mobile' ? randomToggle : null}
         </div>
-
-        <button
-          type="button"
-          className="random-toggle"
-          aria-pressed={playMode === 'random'}
-          onClick={() => (playMode === 'random' ? onDisableRandomMode() : onEnableRandomMode())}
-          disabled={blocked}
-        >
-          Random {playMode === 'random' ? 'ON' : 'OFF'}
-        </button>
+        {layout === 'desktop' ? randomToggle : null}
       </div>
 
       <div className="target-entry">

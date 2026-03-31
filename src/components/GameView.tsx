@@ -11,7 +11,13 @@ import { StatusStrip } from './StatusStrip';
 
 const CELEBRATION_FLASH_MS = 500;
 
-export function GameView({ initialState }: { initialState?: GameState }) {
+export function GameView({
+  initialState,
+  layout = 'desktop',
+}: {
+  initialState?: GameState;
+  layout?: 'desktop' | 'mobile';
+}) {
   const game = useBalancedTernaryGame(initialState);
   const currentSum = computeCurrentSum(game.state.cells);
   const blocked = game.state.status === 'celebrating';
@@ -60,16 +66,18 @@ export function GameView({ initialState }: { initialState?: GameState }) {
   };
 
   return (
-    <main className="app-shell">
+    <main className={`app-shell app-shell--${layout}`}>
       <h1 className="app-title">Balanced Ternary Puzzle</h1>
-      <div className="game-layout">
+      <div className={`game-layout game-layout--${layout}`}>
         <StatusStrip
+          layout={layout}
           boardSize={game.state.boardSize}
           target={game.state.target}
           currentSum={currentSum}
           flash={flashActive}
         />
         <ControlPanel
+          layout={layout}
           boardSize={game.state.boardSize}
           playMode={game.state.playMode}
           draftTarget={game.state.draftTarget}
@@ -87,7 +95,7 @@ export function GameView({ initialState }: { initialState?: GameState }) {
           onDraftChange={game.changeDraftTarget}
           onSubmitTarget={game.submitTarget}
         />
-        <div className="board-stage">
+        <div className={`board-stage board-stage--${layout}`}>
           <BoardGrid
             boardSize={game.state.boardSize}
             cells={game.state.cells}
