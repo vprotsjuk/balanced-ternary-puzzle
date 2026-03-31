@@ -10,6 +10,19 @@ vi.mock('../game/board', async () => {
   };
 });
 
+const audioNoteControls = vi.hoisted(() => ({
+  playCellStateNote: vi.fn(),
+  primeCellStateAudio: vi.fn(),
+}));
+
+vi.mock('../audio/cellNotes', async () => {
+  const actual = await vi.importActual<typeof import('../audio/cellNotes')>('../audio/cellNotes');
+  return {
+    ...actual,
+    ...audioNoteControls,
+  };
+});
+
 import { randomTarget } from '../game/board';
 import { GameView } from './GameView';
 
@@ -25,6 +38,49 @@ afterEach(() => {
   vi.useRealTimers();
   cleanup();
   vi.clearAllMocks();
+});
+
+it('primes audio on the real tap path and plays one note for the committed cell state change', () => {
+  render(
+    <GameView
+      initialState={createGameState({
+        boardSize: 2,
+        playMode: 'sequential',
+        target: 7,
+      })}
+    />,
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: 'Cell 1, neutral' }));
+
+  expect(audioNoteControls.primeCellStateAudio).toHaveBeenCalledTimes(1);
+  expect(audioNoteControls.playCellStateNote).toHaveBeenCalledTimes(1);
+  expect(audioNoteControls.playCellStateNote).toHaveBeenCalledWith(0, 'plus');
+});
+
+it('does not play note audio for a bulk board reset after a winning tap', () => {
+  vi.useFakeTimers();
+
+  render(
+    <GameView
+      initialState={createGameState({
+        boardSize: 2,
+        playMode: 'sequential',
+        target: 1,
+      })}
+    />,
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: 'Cell 1, neutral' }));
+
+  expect(audioNoteControls.playCellStateNote).toHaveBeenCalledTimes(1);
+  expect(audioNoteControls.playCellStateNote).toHaveBeenLastCalledWith(0, 'plus');
+
+  act(() => {
+    vi.advanceTimersByTime(1000);
+  });
+
+  expect(audioNoteControls.playCellStateNote).toHaveBeenCalledTimes(1);
 });
 
 it('switches board sizes without RNG in sequential mode and only uses RNG in random mode', () => {

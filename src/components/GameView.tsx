@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { playCellStateNote, primeCellStateAudio } from '../audio/cellNotes';
+import { getCommittedCellStateNote } from '../audio/playbackObserver';
 import { computeCurrentSum, getBoardRangeLabel, randomTarget } from '../game/board';
 import { useBalancedTernaryGame } from '../game/useBalancedTernaryGame';
 import type { GameState } from '../game/state';
@@ -15,6 +17,7 @@ export function GameView({ initialState }: { initialState?: GameState }) {
   const blocked = game.state.status === 'celebrating';
   const [flashExpired, setFlashExpired] = useState(false);
   const flashActive = blocked && !flashExpired;
+  const previousStateRef = useRef(game.state);
 
   useEffect(() => {
     if (!blocked) {
@@ -29,6 +32,16 @@ export function GameView({ initialState }: { initialState?: GameState }) {
     return () => window.clearTimeout(timeoutId);
   }, [blocked]);
 
+  useEffect(() => {
+    const committedNote = getCommittedCellStateNote(previousStateRef.current, game.state);
+
+    if (committedNote) {
+      playCellStateNote(committedNote.cellIndex, committedNote.state);
+    }
+
+    previousStateRef.current = game.state;
+  }, [game.state]);
+
   const handleSelectBoardSize = (boardSize: BoardSize) => {
     if (game.state.playMode === 'random') {
       game.selectBoardSize(boardSize, randomTarget(boardSize));
@@ -36,6 +49,11 @@ export function GameView({ initialState }: { initialState?: GameState }) {
     }
 
     game.selectBoardSize(boardSize, 1);
+  };
+
+  const handleCellTap = (index: number) => {
+    primeCellStateAudio();
+    game.tapCell(index);
   };
 
   return (
@@ -72,7 +90,7 @@ export function GameView({ initialState }: { initialState?: GameState }) {
             cells={game.state.cells}
             blocked={blocked}
             flash={flashActive}
-            onCellTap={game.tapCell}
+            onCellTap={handleCellTap}
           />
         </div>
       </div>
