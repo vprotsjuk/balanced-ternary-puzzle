@@ -380,7 +380,7 @@ input {
 }
 
 @media (min-width: 30rem) {
-  .status-strip {
+  .status-strip:not(.status-strip--mobile) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
