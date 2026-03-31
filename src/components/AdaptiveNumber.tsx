@@ -1,25 +1,74 @@
-import type { MeasureText } from './numberLayout';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 type AdaptiveNumberProps = {
   value: number;
   mode: 'banner' | 'cell';
   className?: string;
-  maxWidth?: number;
-  measure?: MeasureText;
 };
 
-export function AdaptiveNumber({
-  value,
-  mode,
-  className,
-  maxWidth: _maxWidth,
-  measure: _measure,
-}: AdaptiveNumberProps) {
+export function AdaptiveNumber({ value, mode, className }: AdaptiveNumberProps) {
   const text = String(value);
+  const wrapperRef = useRef<HTMLSpanElement | null>(null);
+  const lineRef = useRef<HTMLSpanElement | null>(null);
+  const [fitScale, setFitScale] = useState(1);
+  const fitScaleRef = useRef(1);
+
+  fitScaleRef.current = fitScale;
+
+  useLayoutEffect(() => {
+    if (mode !== 'cell') {
+      return undefined;
+    }
+
+    const wrapper = wrapperRef.current;
+    const line = lineRef.current;
+
+    if (!wrapper || !line) {
+      return undefined;
+    }
+
+    const updateScale = () => {
+      const availableWidth = wrapper.getBoundingClientRect().width;
+      const contentWidth = line.getBoundingClientRect().width;
+      const currentScale = fitScaleRef.current;
+
+      if (availableWidth <= 0 || contentWidth <= 0) {
+        setFitScale(1);
+        return;
+      }
+
+      const baseContentWidth = currentScale > 0 ? contentWidth / currentScale : contentWidth;
+      const nextScale = Math.min(1, Number((availableWidth / baseContentWidth).toFixed(3)));
+      setFitScale((currentScale) => (currentScale === nextScale ? currentScale : nextScale));
+    };
+
+    updateScale();
+
+    const resizeObserver =
+      typeof ResizeObserver === 'undefined'
+        ? null
+        : new ResizeObserver(() => {
+            updateScale();
+          });
+
+    resizeObserver?.observe(wrapper);
+    window.addEventListener('resize', updateScale);
+
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', updateScale);
+    };
+  }, [mode, text]);
 
   return (
-    <span className={['adaptive-number', `adaptive-number--${mode}`, className].filter(Boolean).join(' ')}>
-      <span className="adaptive-number__line">{renderFormattedLine(text)}</span>
+    <span
+      ref={wrapperRef}
+      className={['adaptive-number', `adaptive-number--${mode}`, className].filter(Boolean).join(' ')}
+      style={mode === 'cell' ? { fontSize: `${fitScale}em` } : undefined}
+    >
+      <span ref={lineRef} className="adaptive-number__line">
+        {renderFormattedLine(text)}
+      </span>
     </span>
   );
 }

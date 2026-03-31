@@ -1,72 +1,52 @@
 import { render, screen } from '@testing-library/react';
 import { act } from 'react';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { AdaptiveNumber } from '../AdaptiveNumber';
-import { chooseBestTwoLineSplit } from '../numberLayout';
 
 const originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
-const originalGetContext = HTMLCanvasElement.prototype.getContext;
 
 beforeEach(() => {
-  HTMLElement.prototype.getBoundingClientRect = vi.fn(() => ({
-    width: 30,
-    height: 0,
-    top: 0,
-    left: 0,
-    right: 30,
-    bottom: 0,
-    x: 0,
-    y: 0,
-    toJSON: () => '',
-  }));
+  HTMLElement.prototype.getBoundingClientRect = vi.fn(function getBoundingClientRect(
+    this: HTMLElement,
+  ) {
+    const element = this;
 
-  HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
-    font: '',
-    measureText: (text: string) => ({ width: text.length * 10 }),
-  })) as unknown as typeof HTMLCanvasElement.prototype.getContext;
+    if (element.classList.contains('adaptive-number')) {
+      const width = Number(element.dataset.testWidth ?? 60);
+      return makeRect(width);
+    }
+
+    if (element.classList.contains('adaptive-number__line')) {
+      const baseWidth = Number(element.dataset.testWidth ?? 120);
+      const scale = Number(element.closest('.adaptive-number')?.getAttribute('style')?.match(/font-size:\s*([0-9.]+)em/)?.[1] ?? 1);
+      return makeRect(baseWidth * scale);
+    }
+
+    return makeRect(0);
+  });
+
+  vi.stubGlobal(
+    'ResizeObserver',
+    class {
+      observe = vi.fn();
+      disconnect = vi.fn();
+    },
+  );
 });
 
 afterEach(() => {
   HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
-  HTMLCanvasElement.prototype.getContext = originalGetContext;
   vi.unstubAllGlobals();
 });
 
-it('returns null when the value already fits on one line', () => {
-  expect(chooseBestTwoLineSplit(729, (part) => part.length * 10, 40)).toBeNull();
-});
-
-it('chooses the most balanced two-line split when a single line does not fit', () => {
-  expect(chooseBestTwoLineSplit(59049, (part) => part.length * 10, 30)).toEqual([
-    '59',
-    '049',
-  ]);
-});
-
-it('keeps banner numbers on a single line even in a narrow width', () => {
-  const { container } = render(
-    <AdaptiveNumber
-      value={59049}
-      mode="banner"
-      maxWidth={20}
-      measure={(part) => part.length * 10}
-    />,
-  );
+it('keeps banner numbers on a single line with grouped spaces', () => {
+  const { container } = render(<AdaptiveNumber value={59049} mode="banner" />);
 
   expect(container.querySelector('.adaptive-number--banner')?.textContent).toBe('59 049');
-  expect(screen.queryByTestId('adaptive-number-line-break')).not.toBeInTheDocument();
 });
 
 it('renders grouped spaces for banner numbers without introducing a line break', () => {
-  const { container } = render(
-    <AdaptiveNumber
-      value={43046721}
-      mode="banner"
-      maxWidth={20}
-      measure={(part) => part.length * 10}
-    />,
-  );
+  const { container } = render(<AdaptiveNumber value={43046721} mode="banner" />);
 
   expect(
     Array.from(container.querySelectorAll('.adaptive-number__group')).map((node) => node.textContent),
@@ -79,36 +59,8 @@ it('renders grouped spaces for banner numbers without introducing a line break',
   expect(screen.queryByTestId('adaptive-number-line-break')).not.toBeInTheDocument();
 });
 
-it('renders grouped spaces for realistic 4x4 cell values on one line', () => {
-  const { container } = render(
-    <AdaptiveNumber
-      value={2187}
-      mode="cell"
-      maxWidth={140}
-      measure={(part) => part.length * 10}
-    />,
-  );
-
-  expect(
-    Array.from(container.querySelectorAll('.adaptive-number__group')).map((node) => node.textContent),
-  ).toEqual(['2', '187']);
-  expect(
-    Array.from(container.querySelectorAll('.adaptive-number__separator')).map(
-      (node) => node.textContent,
-    ),
-  ).toEqual([' ']);
-  expect(screen.queryByTestId('adaptive-number-line-break')).not.toBeInTheDocument();
-});
-
-it('keeps grouped spaces when a long cell value stays on one line', () => {
-  const { container } = render(
-    <AdaptiveNumber
-      value={14348907}
-      mode="cell"
-      maxWidth={140}
-      measure={(part) => part.length * 10}
-    />,
-  );
+it('renders grouped spaces for cell values on one line', () => {
+  const { container } = render(<AdaptiveNumber value={14348907} mode="cell" />);
 
   expect(
     Array.from(container.querySelectorAll('.adaptive-number__group')).map((node) => node.textContent),
@@ -121,38 +73,47 @@ it('keeps grouped spaces when a long cell value stays on one line', () => {
   expect(screen.queryByTestId('adaptive-number-line-break')).not.toBeInTheDocument();
 });
 
-it('keeps cell values grouped on the initial commit when measured width is narrow', () => {
-  const observe = vi.fn();
-  const disconnect = vi.fn();
+it('shrinks cell numbers to fit the available width on one line', () => {
+  const { container } = render(<AdaptiveNumber value={14348907} mode="cell" />);
+  const wrapper = container.querySelector('.adaptive-number--cell');
+  const line = container.querySelector('.adaptive-number__line');
 
-  vi.stubGlobal(
-    'ResizeObserver',
-    class {
-      observe = observe;
-      disconnect = disconnect;
-    },
-  );
+  if (!(wrapper instanceof HTMLElement) || !(line instanceof HTMLElement)) {
+    throw new Error('Expected adaptive number elements to render');
+  }
 
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  const root = createRoot(container);
+  wrapper.dataset.testWidth = '60';
+  line.dataset.testWidth = '120';
 
   act(() => {
-    root.render(<AdaptiveNumber value={59049} mode="cell" />);
+    window.dispatchEvent(new Event('resize'));
   });
 
-  expect(container.textContent).toBe('59 049');
-  expect(container.querySelector('[data-testid="adaptive-number-line-break"]')).toBeNull();
-
-  act(() => {
-    root.unmount();
-  });
-  container.remove();
+  expect(wrapper.style.fontSize).toBe('0.5em');
+  expect(line.getBoundingClientRect().width).toBe(60);
 });
 
-it('skips layout reads and observers for banner mode', () => {
+it('restores the base size when the cell number already fits', () => {
+  const { container } = render(<AdaptiveNumber value={2187} mode="cell" />);
+  const wrapper = container.querySelector('.adaptive-number--cell');
+  const line = container.querySelector('.adaptive-number__line');
+
+  if (!(wrapper instanceof HTMLElement) || !(line instanceof HTMLElement)) {
+    throw new Error('Expected adaptive number elements to render');
+  }
+
+  wrapper.dataset.testWidth = '140';
+  line.dataset.testWidth = '70';
+
+  act(() => {
+    window.dispatchEvent(new Event('resize'));
+  });
+
+  expect(wrapper.style.fontSize).toBe('1em');
+});
+
+it('skips resize-based fitting for banner mode', () => {
   const getBoundingClientRect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect');
-  const measure = vi.fn((part: string) => part.length * 10);
   const observe = vi.fn();
   const disconnect = vi.fn();
 
@@ -164,9 +125,23 @@ it('skips layout reads and observers for banner mode', () => {
     },
   );
 
-  render(<AdaptiveNumber value={59049} mode="banner" measure={measure} />);
+  render(<AdaptiveNumber value={59049} mode="banner" />);
 
   expect(getBoundingClientRect).not.toHaveBeenCalled();
   expect(observe).not.toHaveBeenCalled();
-  expect(measure).not.toHaveBeenCalled();
+  expect(disconnect).not.toHaveBeenCalled();
 });
+
+function makeRect(width: number): DOMRect {
+  return {
+    width,
+    height: 0,
+    top: 0,
+    left: 0,
+    right: width,
+    bottom: 0,
+    x: 0,
+    y: 0,
+    toJSON: () => '',
+  } as DOMRect;
+}
