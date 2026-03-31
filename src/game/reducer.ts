@@ -1,4 +1,4 @@
-import { computeCurrentSum, cycleCellState, parseManualTarget } from './board';
+import { clampDraftTarget, computeCurrentSum, cycleCellState, parseManualTarget } from './board';
 import { BOARD_MAX_BY_SIZE, cycleBoardSize } from './config';
 import { resetRound, type GameState } from './state';
 import type { BoardSize } from './types';
@@ -75,7 +75,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       );
     }
     case 'draft/changed':
-      return { ...state, draftTarget: action.value };
+      return { ...state, draftTarget: clampDraftTarget(action.value, state.boardSize) };
     case 'target/submitted': {
       const parsed = parseManualTarget(action.raw, state.boardSize);
       if (parsed === null) return state;

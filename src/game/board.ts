@@ -70,6 +70,17 @@ export function parseManualTarget(raw: string, size: BoardSize): number | null {
   return value <= max ? value : null;
 }
 
+export function clampDraftTarget(raw: string, size: BoardSize): string {
+  const max = BOARD_MAX_BY_SIZE[requireBoardSize(size)];
+  const trimmed = raw.trim();
+  if (!/^[0-9]+$/.test(trimmed)) return raw;
+
+  const value = Number(trimmed);
+  if (!Number.isInteger(value) || value < 1) return raw;
+
+  return value > max ? String(max) : raw;
+}
+
 export function randomTarget(size: BoardSize, rng: () => number = Math.random): number {
   const max = BOARD_MAX_BY_SIZE[requireBoardSize(size)];
   const sample = rng();

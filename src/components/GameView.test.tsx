@@ -107,6 +107,32 @@ it('does not play note audio for a same-target manual reset', () => {
   expect(screen.getByRole('button', { name: 'Cell 1, neutral' })).toBeInTheDocument();
 });
 
+it.each(['desktop', 'mobile'] as const)(
+  'clamps oversized manual input immediately in the shared %s input flow',
+  (layout) => {
+    render(
+      <GameView
+        layout={layout}
+        initialState={createGameState({
+          boardSize: 2,
+          playMode: 'sequential',
+          target: 7,
+        })}
+      />,
+    );
+
+    const input = screen.getByLabelText('Value') as HTMLInputElement;
+
+    fireEvent.change(input, { target: { value: '41' } });
+    expect(input.value).toBe('40');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enter' }));
+
+    expect(getStatusValue('Target')).toBe('40');
+    expect(input.value).toBe('');
+  },
+);
+
 it('switches board sizes without RNG in sequential mode and only uses RNG in random mode', () => {
   const random = vi.mocked(randomTarget);
   random

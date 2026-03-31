@@ -37,6 +37,22 @@ describe('game reducer', () => {
     expect(next.draftTarget).toBe('9');
   });
 
+  it('clamps draft input to the current board maximum while typing', () => {
+    const state = createGameState({ boardSize: 2, playMode: 'sequential', target: 9 });
+    const next = gameReducer(state, { type: 'draft/changed', value: '41' });
+
+    expect(next.draftTarget).toBe('40');
+    expect(next.target).toBe(9);
+  });
+
+  it('keeps empty and obviously invalid draft input as non-submitting states', () => {
+    const state = createGameState({ boardSize: 2, playMode: 'sequential', target: 9, draftTarget: '7' });
+
+    expect(gameReducer(state, { type: 'draft/changed', value: '' }).draftTarget).toBe('');
+    expect(gameReducer(state, { type: 'draft/changed', value: 'abc' }).draftTarget).toBe('abc');
+    expect(gameReducer(state, { type: 'draft/changed', value: '1.5' }).draftTarget).toBe('1.5');
+  });
+
   it('defaults sequential games to the first target instead of a random one', () => {
     const state = createGameState({ boardSize: 3, playMode: 'sequential' });
 

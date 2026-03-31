@@ -1,6 +1,7 @@
 import {
   createNeutralCells,
   buildCellValues,
+  clampDraftTarget,
   computeCurrentSum,
   cycleBoardSize,
   getBoardRangeLabel,
@@ -66,6 +67,14 @@ describe('board utilities', () => {
     expect(parseManualTarget('1.5', 3)).toBeNull();
     expect(parseManualTarget('-3', 3)).toBeNull();
     expect(parseManualTarget('9842', 3)).toBeNull();
+  });
+
+  it('clamps only oversized numeric draft values and preserves other draft states', () => {
+    expect(clampDraftTarget('41', 2)).toBe('40');
+    expect(clampDraftTarget('0040', 2)).toBe('0040');
+    expect(clampDraftTarget('', 2)).toBe('');
+    expect(clampDraftTarget('1.5', 2)).toBe('1.5');
+    expect(clampDraftTarget('abc', 2)).toBe('abc');
   });
 
   it('rejects non-string manual target input instead of trimming it', () => {
