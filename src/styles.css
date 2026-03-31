@@ -1,6 +1,9 @@
 :root {
   font-family: Inter, system-ui, sans-serif;
   color: #141414;
+  --interactive-neutral-bg: #f0e6d8;
+  --interactive-neutral-fg: #41362b;
+  --interactive-neutral-stroke: rgba(112, 88, 60, 0.2);
   background:
     radial-gradient(circle at top, #fff8ed 0%, #f5efe5 50%, #e8dfd1 100%);
 }
@@ -199,8 +202,8 @@ input {
 }
 
 .chip {
-  background: #f0e6d8;
-  color: #41362b;
+  background: var(--interactive-neutral-bg);
+  color: var(--interactive-neutral-fg);
   min-width: 0;
 }
 
@@ -248,8 +251,8 @@ input {
 }
 
 .target-entry-row button {
-  background: #f0e6d8;
-  color: #41362b;
+  background: var(--interactive-neutral-bg);
+  color: var(--interactive-neutral-fg);
 }
 
 .board-grid {
@@ -313,8 +316,8 @@ input {
 }
 
 .board-cell--neutral {
-  background: #ead9bf;
-  box-shadow: inset 0 0 0 1px rgba(112, 88, 60, 0.2);
+  background: var(--interactive-neutral-bg);
+  box-shadow: inset 0 0 0 1px var(--interactive-neutral-stroke);
 }
 
 .board-grid--flash {
