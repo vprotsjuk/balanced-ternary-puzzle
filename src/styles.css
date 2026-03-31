@@ -84,6 +84,8 @@ input {
   gap: 0.35rem;
   padding: 0.95rem 1rem;
   min-width: 0;
+  justify-items: center;
+  text-align: center;
 }
 
 .status-card--positive {
@@ -122,6 +124,8 @@ input {
   min-width: 0;
   font-size: clamp(1.25rem, 5.4vw, 2rem);
   line-height: 1;
+  width: 100%;
+  text-align: center;
 }
 
 .status-meta {
@@ -240,7 +244,7 @@ input {
 }
 
 .board-grid--size-4 {
-  --cell-font-size: clamp(0.82rem, 3.8vw, 1.18rem);
+  --cell-font-size: clamp(0.78rem, 3.5vw, 1.08rem);
 }
 
 .board-cell--plus {
@@ -267,8 +271,12 @@ input {
 }
 
 .adaptive-number {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
+  min-width: 0;
+  text-align: center;
 }
 
 .adaptive-number--banner {
@@ -277,11 +285,8 @@ input {
 }
 
 .adaptive-number--cell {
-  display: grid;
-  justify-items: center;
-  align-content: center;
-  line-height: 0.92;
-  width: 100%;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .adaptive-number__line {
@@ -289,7 +294,8 @@ input {
   align-items: baseline;
   justify-content: center;
   flex-wrap: nowrap;
-  width: 100%;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .adaptive-number__group {
@@ -303,10 +309,8 @@ input {
 
 .adaptive-number__separator {
   display: inline-block;
-  margin: 0 0.12em;
-  opacity: 0.34;
-  transform: scale(0.82) translateY(-0.04em);
-  transform-origin: center;
+  white-space: pre;
+  margin: 0 0.03em;
 }
 
 .adaptive-number__line-break {

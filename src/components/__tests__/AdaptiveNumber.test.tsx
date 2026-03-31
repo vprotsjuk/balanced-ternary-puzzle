@@ -54,11 +54,11 @@ it('keeps banner numbers on a single line even in a narrow width', () => {
     />,
   );
 
-  expect(container.querySelector('.adaptive-number--banner')?.textContent).toBe('59·049');
+  expect(container.querySelector('.adaptive-number--banner')?.textContent).toBe('59 049');
   expect(screen.queryByTestId('adaptive-number-line-break')).not.toBeInTheDocument();
 });
 
-it('renders grouped separators for banner numbers without introducing a line break', () => {
+it('renders grouped spaces for banner numbers without introducing a line break', () => {
   const { container } = render(
     <AdaptiveNumber
       value={43046721}
@@ -71,26 +71,15 @@ it('renders grouped separators for banner numbers without introducing a line bre
   expect(
     Array.from(container.querySelectorAll('.adaptive-number__group')).map((node) => node.textContent),
   ).toEqual(['43', '046', '721']);
-  expect(container.querySelectorAll('.adaptive-number__separator')).toHaveLength(2);
+  expect(
+    Array.from(container.querySelectorAll('.adaptive-number__separator')).map(
+      (node) => node.textContent,
+    ),
+  ).toEqual([' ', ' ']);
   expect(screen.queryByTestId('adaptive-number-line-break')).not.toBeInTheDocument();
 });
 
-it('splits cell numbers across two lines when needed for fit', () => {
-  render(
-    <AdaptiveNumber
-      value={59049}
-      mode="cell"
-      maxWidth={30}
-      measure={(part) => part.length * 10}
-    />,
-  );
-
-  expect(screen.getByText('59')).toBeInTheDocument();
-  expect(screen.getByText('049')).toBeInTheDocument();
-  expect(screen.getByTestId('adaptive-number-line-break')).toBeInTheDocument();
-});
-
-it('renders visible but subtle separators for realistic 4x4 cell values', () => {
+it('renders grouped spaces for realistic 4x4 cell values on one line', () => {
   const { container } = render(
     <AdaptiveNumber
       value={2187}
@@ -107,10 +96,11 @@ it('renders visible but subtle separators for realistic 4x4 cell values', () => 
     Array.from(container.querySelectorAll('.adaptive-number__separator')).map(
       (node) => node.textContent,
     ),
-  ).toEqual(['·']);
+  ).toEqual([' ']);
+  expect(screen.queryByTestId('adaptive-number-line-break')).not.toBeInTheDocument();
 });
 
-it('keeps grouped separators when a long cell value stays on one line', () => {
+it('keeps grouped spaces when a long cell value stays on one line', () => {
   const { container } = render(
     <AdaptiveNumber
       value={14348907}
@@ -123,10 +113,15 @@ it('keeps grouped separators when a long cell value stays on one line', () => {
   expect(
     Array.from(container.querySelectorAll('.adaptive-number__group')).map((node) => node.textContent),
   ).toEqual(['14', '348', '907']);
-  expect(container.querySelectorAll('.adaptive-number__separator')).toHaveLength(2);
+  expect(
+    Array.from(container.querySelectorAll('.adaptive-number__separator')).map(
+      (node) => node.textContent,
+    ),
+  ).toEqual([' ', ' ']);
+  expect(screen.queryByTestId('adaptive-number-line-break')).not.toBeInTheDocument();
 });
 
-it('renders the cell split during the initial commit when measured width is narrow', () => {
+it('keeps cell values grouped on the initial commit when measured width is narrow', () => {
   const observe = vi.fn();
   const disconnect = vi.fn();
 
@@ -146,8 +141,8 @@ it('renders the cell split during the initial commit when measured width is narr
     root.render(<AdaptiveNumber value={59049} mode="cell" />);
   });
 
-  expect(container.textContent).toBe('59049');
-  expect(container.querySelector('[data-testid="adaptive-number-line-break"]')).not.toBeNull();
+  expect(container.textContent).toBe('59 049');
+  expect(container.querySelector('[data-testid="adaptive-number-line-break"]')).toBeNull();
 
   act(() => {
     root.unmount();

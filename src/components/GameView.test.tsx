@@ -59,7 +59,7 @@ it('switches board sizes without RNG in sequential mode and only uses RNG in ran
 
   expect(random).toHaveBeenCalledWith(4);
   expect(screen.getByText(/Board 4x4/)).toBeInTheDocument();
-  expect(getStatusValue('Target')).toBe('54·321');
+  expect(getStatusValue('Target')).toBe('54 321');
 });
 
 it('locks controls for one second and then automatically starts the next random round', () => {
@@ -238,9 +238,9 @@ it('renders long 4x4 status values and labels for the game state', () => {
   expect(screen.getByText('Current Sum')).toBeInTheDocument();
   expect(screen.getByText('Difference')).toBeInTheDocument();
   expect(screen.getByText('Board 4x4')).toBeInTheDocument();
-  expect(getStatusValue('Target')).toBe('43·046·721');
-  expect(getStatusValue('Current Sum')).toBe('21·523·360');
-  expect(getStatusValue('Difference')).toBe('21·523·361');
+  expect(getStatusValue('Target')).toBe('43 046 721');
+  expect(getStatusValue('Current Sum')).toBe('21 523 360');
+  expect(getStatusValue('Difference')).toBe('21 523 361');
   expect(getStatusCard('Difference')).toHaveClass('status-card--positive');
 });
 
