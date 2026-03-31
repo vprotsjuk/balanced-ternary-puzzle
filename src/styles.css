@@ -272,14 +272,22 @@ input {
 
 .adaptive-number__line {
   display: inline-flex;
+  align-items: baseline;
   justify-content: center;
   flex-wrap: nowrap;
-  gap: 0.12em;
   width: 100%;
 }
 
 .adaptive-number__group {
   display: inline-block;
+}
+
+.adaptive-number__separator {
+  display: inline-block;
+  margin: 0 0.12em;
+  opacity: 0.34;
+  transform: scale(0.82) translateY(-0.04em);
+  transform-origin: center;
 }
 
 .adaptive-number__line-break {

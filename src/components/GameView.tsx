@@ -13,18 +13,17 @@ export function GameView({ initialState }: { initialState?: GameState }) {
   const game = useBalancedTernaryGame(initialState);
   const currentSum = computeCurrentSum(game.state.cells);
   const blocked = game.state.status === 'celebrating';
-  const [flashActive, setFlashActive] = useState(blocked);
+  const [flashExpired, setFlashExpired] = useState(false);
+  const flashActive = blocked && !flashExpired;
 
   useEffect(() => {
     if (!blocked) {
-      setFlashActive(false);
+      setFlashExpired(false);
       return undefined;
     }
 
-    setFlashActive(true);
-
     const timeoutId = window.setTimeout(() => {
-      setFlashActive(false);
+      setFlashExpired(true);
     }, CELEBRATION_FLASH_MS);
 
     return () => window.clearTimeout(timeoutId);

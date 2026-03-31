@@ -73,7 +73,27 @@ it('splits cell numbers across two lines when needed for fit', () => {
   expect(screen.getByTestId('adaptive-number-line-break')).toBeInTheDocument();
 });
 
-it('adds subtle grouped-digit wrappers for longer cell numbers', () => {
+it('renders visible but subtle separators for realistic 4x4 cell values', () => {
+  const { container } = render(
+    <AdaptiveNumber
+      value={2187}
+      mode="cell"
+      maxWidth={140}
+      measure={(part) => part.length * 10}
+    />,
+  );
+
+  expect(
+    Array.from(container.querySelectorAll('.adaptive-number__group')).map((node) => node.textContent),
+  ).toEqual(['2', '187']);
+  expect(
+    Array.from(container.querySelectorAll('.adaptive-number__separator')).map(
+      (node) => node.textContent,
+    ),
+  ).toEqual(['·']);
+});
+
+it('keeps grouped separators when a long cell value stays on one line', () => {
   const { container } = render(
     <AdaptiveNumber
       value={14348907}
@@ -86,6 +106,7 @@ it('adds subtle grouped-digit wrappers for longer cell numbers', () => {
   expect(
     Array.from(container.querySelectorAll('.adaptive-number__group')).map((node) => node.textContent),
   ).toEqual(['14', '348', '907']);
+  expect(container.querySelectorAll('.adaptive-number__separator')).toHaveLength(2);
 });
 
 it('renders the cell split during the initial commit when measured width is narrow', () => {

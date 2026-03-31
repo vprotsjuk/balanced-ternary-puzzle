@@ -109,15 +109,24 @@ function renderFormattedLine(text: string, grouped: boolean) {
     return text;
   }
 
-  return groups.map((group, index) => (
+  return groups.flatMap((group, index) => [
     <span key={`${group}-${index}`} className="adaptive-number__group">
       {group}
-    </span>
-  ));
+    </span>,
+    index < groups.length - 1 ? (
+      <span
+        key={`separator-${group}-${index}`}
+        aria-hidden="true"
+        className="adaptive-number__separator"
+      >
+        ·
+      </span>
+    ) : null,
+  ]);
 }
 
 function groupDigits(text: string) {
-  if (text.length < 5) {
+  if (text.length < 4) {
     return [text];
   }
 
