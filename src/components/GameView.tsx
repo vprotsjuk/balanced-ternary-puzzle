@@ -18,6 +18,7 @@ export function GameView({ initialState }: { initialState?: GameState }) {
   const [flashExpired, setFlashExpired] = useState(false);
   const flashActive = blocked && !flashExpired;
   const previousStateRef = useRef(game.state);
+  const pendingTapCountRef = useRef(0);
 
   useEffect(() => {
     if (!blocked) {
@@ -35,7 +36,8 @@ export function GameView({ initialState }: { initialState?: GameState }) {
   useEffect(() => {
     const committedNote = getCommittedCellStateNote(previousStateRef.current, game.state);
 
-    if (committedNote) {
+    if (committedNote && pendingTapCountRef.current > 0) {
+      pendingTapCountRef.current -= 1;
       playCellStateNote(committedNote.cellIndex, committedNote.state);
     }
 
@@ -52,7 +54,8 @@ export function GameView({ initialState }: { initialState?: GameState }) {
   };
 
   const handleCellTap = (index: number) => {
-    primeCellStateAudio();
+    pendingTapCountRef.current += 1;
+    void primeCellStateAudio();
     game.tapCell(index);
   };
 

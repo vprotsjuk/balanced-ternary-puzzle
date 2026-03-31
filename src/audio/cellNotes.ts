@@ -14,6 +14,7 @@ const SLOT_OFFSET_BY_STATE: Record<CellState, number> = {
 };
 
 let audioContext: AudioContext | null = null;
+let audioReadyPromise: Promise<AudioContext | null> | null = null;
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') {
@@ -49,19 +50,24 @@ export function getCellStateNoteFrequency(cellIndex: number, state: CellState): 
 
 export function primeCellStateAudio() {
   const context = getAudioContext();
-  if (!context || context.state !== 'suspended') {
-    return;
+  if (!context) {
+    return Promise.resolve(null);
   }
 
-  void context.resume();
+  if (context.state !== 'suspended') {
+    return Promise.resolve(context);
+  }
+
+  if (!audioReadyPromise) {
+    audioReadyPromise = context.resume().then(() => context).finally(() => {
+      audioReadyPromise = null;
+    });
+  }
+
+  return audioReadyPromise;
 }
 
-export function playCellStateNote(cellIndex: number, state: CellState) {
-  const context = getAudioContext();
-  if (!context) {
-    return;
-  }
-
+function playCellStateNoteNow(context: AudioContext, cellIndex: number, state: CellState) {
   if (context.state === 'suspended') {
     return;
   }
@@ -91,4 +97,27 @@ export function playCellStateNote(cellIndex: number, state: CellState) {
     },
     { once: true },
   );
+}
+
+export function playCellStateNote(cellIndex: number, state: CellState) {
+  const context = getAudioContext();
+  if (!context) {
+    return;
+  }
+
+  if (context.state === 'suspended') {
+    void primeCellStateAudio().then((readyContext) => {
+      if (readyContext) {
+        playCellStateNoteNow(readyContext, cellIndex, state);
+      }
+    });
+    return;
+  }
+
+  playCellStateNoteNow(context, cellIndex, state);
+}
+
+export function __resetCellStateAudioForTests() {
+  audioContext = null;
+  audioReadyPromise = null;
 }

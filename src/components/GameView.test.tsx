@@ -83,6 +83,30 @@ it('does not play note audio for a bulk board reset after a winning tap', () => 
   expect(audioNoteControls.playCellStateNote).toHaveBeenCalledTimes(1);
 });
 
+it('does not play note audio for a same-target manual reset', () => {
+  render(
+    <GameView
+      initialState={createGameState({
+        boardSize: 2,
+        playMode: 'sequential',
+        target: 7,
+        draftTarget: '7',
+        cells: [
+          { value: 1, state: 'plus' },
+          { value: 3, state: 'neutral' },
+          { value: 9, state: 'neutral' },
+          { value: 27, state: 'neutral' },
+        ],
+      })}
+    />,
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: 'Enter' }));
+
+  expect(audioNoteControls.playCellStateNote).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: 'Cell 1, neutral' })).toBeInTheDocument();
+});
+
 it('switches board sizes without RNG in sequential mode and only uses RNG in random mode', () => {
   const random = vi.mocked(randomTarget);
   random
